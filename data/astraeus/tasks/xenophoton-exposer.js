@@ -48,7 +48,7 @@ var xenophotons2 = '\
 		<button class="backbutton" onmousedown="playRandomSound()" style="left: 27px; width: 59px; height: 41px; top: 86px" onclick="StartContent(\'mainMenu\');">Main Menu</button>\
 		<button class="backbutton" onmousedown="playRandomSound()" style="left: 372px; width: 154px; height: 20px; top: 556px" onclick="StartContent(\'mainMenu\');">Main Menu</button>\
 		<div class="videoposition"><video width="824" height="439" controls>\
-			<source src="videos/KreegSecretTransmission.mp4" type="video/mp4">\
+			<source src="../videos/KreegSecretTransmission.mp4" type="video/mp4">\
 			Your browser does not support the video tag.\
 		</video></div>\
 		';

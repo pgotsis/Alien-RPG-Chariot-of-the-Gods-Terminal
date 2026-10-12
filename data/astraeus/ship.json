@@ -1,0 +1,186 @@
+{
+  "id": "astraeus",
+  "name": "Astraeus",
+  "computer": "Ship computer",
+  "salt": "astraeus-computer-v1",
+  "schematicOrder": ["public", "crew", "research", "security", "command", "company"],
+  "clearanceInherits": {
+    "public": [],
+    "crew": ["public"],
+    "security": ["crew"],
+    "research": ["crew"],
+    "command": ["security", "research"],
+    "company": ["command"]
+  },
+  "clearanceGrants": {
+    "public": {
+      "modules": ["personnel", "status", "logs", "tasks"],
+      "mail": [],
+      "notes": [],
+      "schematic": "public",
+      "rosterDetail": false
+    },
+    "crew": {
+      "modules": ["personnel", "status", "logs", "tasks"],
+      "mail": [],
+      "notes": [],
+      "schematic": "crew",
+      "rosterDetail": false
+    }
+  },
+  "modules": [
+    { "id": "personnel", "label": "Personnel" },
+    { "id": "status", "label": "Ship status" },
+    { "id": "logs", "label": "Logs" },
+    { "id": "tasks", "label": "Tasks" }
+  ],
+  "tasks": [
+    {
+      "id": "xenophoton-exposer",
+      "title": "Xenophoton exposer",
+      "kind": "puzzle",
+      "clearance": ["public"],
+      "summary": "A star chart can be set to match a pattern exposed from the xenophoton network."
+    },
+    {
+      "id": "xenospace-drive",
+      "title": "Xenospace drive",
+      "kind": "puzzle",
+      "clearance": ["public"],
+      "summary": "The drive configuration is a grid the operator fills in before a jump."
+    },
+    {
+      "id": "lucidite-scanner",
+      "title": "Lucidite scanner",
+      "kind": "puzzle",
+      "clearance": ["public"],
+      "summary": "A rover reports a sector. The operator enters that sector on the scanner."
+    },
+    {
+      "id": "alien-artifact",
+      "title": "Alien artifact",
+      "kind": "puzzle",
+      "clearance": ["public"],
+      "summary": "The artifact record is locked behind a restricted code."
+    },
+    {
+      "id": "biogenetic-research",
+      "title": "Biogenetic research",
+      "kind": "procedure",
+      "clearance": ["public"],
+      "summary": "The lab keeps a short sequence for the Impon VII specimens."
+    }
+  ],
+  "accounts": [
+    {
+      "id": "public",
+      "name": "Public Access",
+      "shortName": "Public",
+      "job": "Terminal",
+      "clearance": ["public"],
+      "listed": false,
+      "pinHashes": ["c7e4042543ef7de1ca60e5a5b66c2132d35f54d0203f1ccef3f69f5f7b58f92d"]
+    },
+    {
+      "id": "j-vargas",
+      "name": "Judd Vargas",
+      "shortName": "J.Vargas",
+      "job": "Captain",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
+    },
+    {
+      "id": "d-holtz",
+      "name": "Dalton Holtz",
+      "shortName": "D.Holtz",
+      "job": "Chief Engineer",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "listed": true
+    },
+    {
+      "id": "a-buchanan",
+      "name": "Alaine Buchanan",
+      "shortName": "A.Buchanan",
+      "job": "Science Officer",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "listed": true
+    },
+    {
+      "id": "r-shimaki",
+      "name": "Riku Shimaki",
+      "shortName": "R.Shimaki",
+      "job": "Combat Officer",
+      "clearance": ["crew"],
+      "status": "Deceased",
+      "listed": true
+    },
+    {
+      "id": "i-asoon",
+      "name": "Inbibi Asoon",
+      "shortName": "I.Asoon",
+      "job": "Xenospace Operator",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "listed": true
+    },
+    {
+      "id": "roro",
+      "name": "Ro-Ro",
+      "shortName": "Ro-Ro",
+      "job": "Astro Rover",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "listed": true
+    }
+  ],
+  "announcements": [],
+  "logs": [
+    {
+      "id": "log-impon",
+      "time": "",
+      "clearance": ["public"],
+      "text": "Ordered to XCD-14 to survey wildlife on Impon VII. The crew found an alien temple and an artifact. Captain Vargas ended the mission and returned to the ship with it."
+    },
+    {
+      "id": "log-ambush",
+      "time": "",
+      "clearance": ["public"],
+      "text": "An Urbraxian corpse vessel demanded the artifact. The xenospace jump failed. Lucidite reserves are spent. The ship escaped on impulse."
+    },
+    {
+      "id": "log-capsules",
+      "time": "",
+      "clearance": ["public"],
+      "text": "Captain Vargas ordered the remaining crew into escape capsules and stayed aboard at minimal power."
+    }
+  ],
+  "systems": [
+    {
+      "id": "lucidite",
+      "name": "Lucidite reserves",
+      "state": "0%",
+      "detail": { "public": "Spent in the failed xenospace jump." }
+    },
+    {
+      "id": "impulse",
+      "name": "Impulse engines",
+      "state": "Ruptured",
+      "detail": { "public": "Damaged while fleeing the corpse vessel." }
+    },
+    {
+      "id": "shields",
+      "name": "Shields",
+      "state": "0%",
+      "detail": { "public": "Down after the engagement." }
+    },
+    {
+      "id": "xenospace",
+      "name": "Xenospace drive",
+      "state": "Data loss",
+      "detail": { "public": "Configuration data was lost. The drive is not ready to jump." }
+    }
+  ]
+}

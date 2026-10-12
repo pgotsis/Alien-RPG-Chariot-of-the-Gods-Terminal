@@ -1,0 +1,24 @@
+{
+  "name": "muthr-terminal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MU/TH/UR ship terminal",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.6",
+    "fastify": "^5.6.1",
+    "pino": "^9.11.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.10",
+    "vite": "^8.3.4",
+    "vue": "^3.5.43"
+  }
+}
