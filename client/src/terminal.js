@@ -313,7 +313,13 @@ export function createTerminal() {
 					const same = shared.revision === state.revision;
 					state.revision = shared.revision;
 					state.pulses = shared.pulses || [];
-					if (!same) applySharedState(state.ship, shared);
+					if (!same) {
+						applySharedState(state.ship, shared);
+						if (state.account) {
+							state.account = accountById(state.ship, state.account.id) || state.account;
+							state.grants = grantsFor(state.ship, state.account);
+						}
+					}
 					if (state.session.overrideToken && shared.packet) state.packet = shared.packet;
 				}
 			}

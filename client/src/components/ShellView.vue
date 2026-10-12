@@ -9,6 +9,7 @@ import NotesView from "./NotesView.vue";
 import PacketView from "./PacketView.vue";
 import PersonnelView from "./PersonnelView.vue";
 import ScreenBar from "./ScreenBar.vue";
+import StarMapView from "./StarMapView.vue";
 import StatusView from "./StatusView.vue";
 import TasksView from "./TasksView.vue";
 
@@ -53,6 +54,7 @@ watch(tabs, function (list) {
 	</nav>
 
 	<MailView v-if="terminal.state.module === 'mail'" />
+	<StarMapView v-else-if="terminal.state.module === 'starmap'" />
 	<MapView v-else-if="terminal.state.module === 'map'" />
 	<PersonnelView v-else-if="terminal.state.module === 'personnel'" />
 	<StatusView v-else-if="terminal.state.module === 'status'" />
