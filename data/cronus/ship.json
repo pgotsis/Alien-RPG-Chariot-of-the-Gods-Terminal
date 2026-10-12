@@ -84,19 +84,6 @@
   },
   "accounts": [
     {
-      "id": "public",
-      "name": "Public Access",
-      "shortName": "Public",
-      "job": "Terminal",
-      "clearance": ["public"],
-      "listed": false,
-      "photo": "",
-      "pinHashes": [
-        "8f94245a5cd886e8bdea2ceecf6e8a766cbfc15e46451af6b16c1ff74ecb1a8e",
-        "7c58636617520e440203c1eb8eb4b30c0d4f0c602ecea68693210de8160efe9a"
-      ]
-    },
-    {
       "id": "s-andrews",
       "name": "Sharon Andrews",
       "shortName": "S.Andrews",
@@ -533,12 +520,16 @@
       "id": "airlock",
       "name": "Main airlock",
       "state": "Open",
+      "clearance": "public",
+      "level": "NOTICE",
       "detail": { "crew": "Umbilical detected. Deck access A-C." }
     },
     {
       "id": "scrubbers",
       "name": "Air scrubbers",
       "state": "20% efficiency",
+      "clearance": "public",
+      "level": "WARNING",
       "detail": {
         "crew": "Operating at 20% efficiency due to accumulated pollutants.",
         "security": "Cleaning required before the displacement drive can be engaged. Reachable through the ventilation shafts. Electrolysis is enabled. Risk of electrocution."
@@ -548,6 +539,8 @@
       "id": "ftl",
       "name": "Displacement drive",
       "state": "Offline",
+      "clearance": "crew",
+      "level": "CRITICAL",
       "detail": {
         "crew": "Unable to engage.",
         "security": "Relay disconnected from four fission engines. Radiation leak detected at reactor relay control."
@@ -557,6 +550,8 @@
       "id": "comms",
       "name": "Communications",
       "state": "Damaged",
+      "clearance": "public",
+      "level": "WARNING",
       "detail": {
         "crew": "Comms array damaged.",
         "command": "Micro-meteor storm damaged the comms array and navigation. Lightspeed is disengaged. The ship is at sublight."
@@ -566,6 +561,8 @@
       "id": "cryo",
       "name": "Cryochambers",
       "state": "Secured",
+      "clearance": "crew",
+      "level": "NOTICE",
       "detail": {
         "crew": "Chambers sealed under the lockdown order.",
         "research": "Five life signs detected. 2 deceased. 4 chambers empty."
@@ -575,6 +572,8 @@
       "id": "reactor",
       "name": "Reactor relay",
       "state": "Fault",
+      "clearance": "security",
+      "level": "CRITICAL",
       "detail": {
         "security": "Power from the four engine pods channels through this relay. Forbidden area: emergency self destruct is accessible here."
       }
@@ -583,6 +582,8 @@
       "id": "science-module",
       "name": "Science module",
       "state": "Ejected",
+      "clearance": "public",
+      "level": "WARNING",
       "detail": { "crew": "Science module ejected from the ship." }
     }
   ],

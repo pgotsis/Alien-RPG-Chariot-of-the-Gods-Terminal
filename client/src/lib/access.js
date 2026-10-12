@@ -152,6 +152,11 @@ function entryVisible(entry, viewClearance) {
 	return need.some(function (tag) { return viewClearance.indexOf(tag) !== -1; });
 }
 
+function systemVisible(system, viewClearance) {
+	const need = system && system.clearance ? system.clearance : "crew";
+	return (viewClearance || []).indexOf(need) !== -1;
+}
+
 function accountForPin(ship, pin) {
 	return (ship.accounts || []).find(function (account) {
 		const hashed = pinHash(account.pinSalt || ship.salt, pin);
@@ -180,6 +185,7 @@ export {
 	messagesFor,
 	notesVisible,
 	entryVisible,
+	systemVisible,
 	accountForPin,
 	accessLabel
 };

@@ -97,11 +97,28 @@ export function createTerminal() {
 		});
 	}
 
+	function firstModule(grants) {
+		const modules = (grants && grants.modules) || [];
+		if (modules.length) return modules[0];
+		return "status";
+	}
+
+	function enterPublic() {
+		state.account = null;
+		state.grants = grantsFor(state.ship, { clearance: ["public"] });
+		state.module = "home";
+		state.pendingId = null;
+		state.unlisted = false;
+		state.pin = "";
+		state.loginError = "";
+		state.mode = "public";
+	}
+
 	function setAccount(account) {
 		state.session.accountId = account.id;
 		state.account = account;
 		state.grants = grantsFor(state.ship, account);
-		state.module = "home";
+		state.module = firstModule(state.grants);
 		state.archiveId = account.id;
 		state.folder = "inbox";
 		state.openMailId = null;
@@ -115,13 +132,25 @@ export function createTerminal() {
 		save();
 	}
 
+	function openLogin() {
+		play("keyok1.mp3");
+		state.unlisted = false;
+		state.pin = "";
+		state.loginError = "";
+		state.mode = "login";
+		const people = (state.ship.accounts || []).filter(function (account) {
+			return account.listed && account.id !== "public" && (account.pinHash || (account.pinHashes && account.pinHashes.length));
+		}).sort(function (a, b) { return a.name.localeCompare(b.name); });
+		state.pendingId = people.length ? people[0].id : null;
+	}
+
 	function selectCrew(account) {
 		play("keyok1.mp3");
 		state.pendingId = account.id;
 		state.unlisted = false;
 		state.pin = "";
 		state.loginError = "";
-		state.mode = "pin";
+		state.mode = "login";
 	}
 
 	function otherCredentials() {
@@ -130,14 +159,7 @@ export function createTerminal() {
 		state.unlisted = true;
 		state.pin = "";
 		state.loginError = "";
-		state.mode = "pin";
-	}
-
-	function publicAccess() {
-		const account = accountById(state.ship, "public");
-		if (!account) return;
-		play("accessgranted.mp3");
-		setAccount(account);
+		state.mode = "login";
 	}
 
 	function pushPin(digit) {
@@ -181,9 +203,17 @@ export function createTerminal() {
 	}
 
 	function backToLogin() {
-		state.mode = "login";
+		state.unlisted = false;
 		state.pin = "";
 		state.loginError = "";
+		state.mode = "login";
+	}
+
+	function backToPublic() {
+		state.pin = "";
+		state.loginError = "";
+		state.unlisted = false;
+		enterPublic();
 	}
 
 	function resetStation() {
@@ -191,11 +221,8 @@ export function createTerminal() {
 		if (!window.confirm("Clear this station's login, unlocks, and notes?")) return;
 		resetSession(sessionId());
 		state.session = emptySession();
-		state.account = null;
-		state.grants = null;
 		state.packet = null;
-		state.mode = "login";
-		state.loginError = "";
+		enterPublic();
 	}
 
 	function logout() {
@@ -203,9 +230,7 @@ export function createTerminal() {
 		state.session.overrideToken = null;
 		state.packet = null;
 		save();
-		state.account = null;
-		state.grants = null;
-		state.mode = "login";
+		enterPublic();
 	}
 
 	function openModule(id) {
@@ -215,8 +240,12 @@ export function createTerminal() {
 	}
 
 	function home() {
-		state.module = "home";
-		ack("announcements");
+		if (state.mode === "app" && state.grants) {
+			state.module = firstModule(state.grants);
+			ack(state.module);
+			return;
+		}
+		enterPublic();
 	}
 
 	function unlockEntry(entry) {
@@ -234,7 +263,7 @@ export function createTerminal() {
 	}
 
 	function onKeydown(event) {
-		if (state.mode !== "pin") return;
+		if (state.mode !== "login") return;
 		if (event.key >= "0" && event.key <= "9") {
 			pushPin(event.key);
 			event.preventDefault();
@@ -248,7 +277,8 @@ export function createTerminal() {
 			submitPin();
 			event.preventDefault();
 		} else if (event.key === "Escape") {
-			backToLogin();
+			if (state.unlisted) backToLogin();
+			else backToPublic();
 		}
 	}
 
@@ -313,9 +343,7 @@ export function createTerminal() {
 		if (state.session.accountId && accountById(state.ship, state.session.accountId)) {
 			setAccount(accountById(state.ship, state.session.accountId));
 		} else {
-			state.account = null;
-			state.grants = null;
-			state.mode = "login";
+			enterPublic();
 		}
 	}
 
@@ -461,12 +489,12 @@ export function createTerminal() {
 			if (account) setAccount(account);
 			else {
 				state.loginError = "Access denied";
-				state.mode = "login";
+				enterPublic();
 			}
 		} else if (state.session.accountId && accountById(state.ship, state.session.accountId)) {
 			setAccount(accountById(state.ship, state.session.accountId));
 		} else {
-			state.mode = "login";
+			enterPublic();
 		}
 	}
 
@@ -526,11 +554,12 @@ export function createTerminal() {
 		save,
 		selectCrew,
 		otherCredentials,
-		publicAccess,
+		openLogin,
 		pushPin,
 		clearPin,
 		submitPin,
 		backToLogin,
+		backToPublic,
 		resetStation,
 		logout,
 		openModule,

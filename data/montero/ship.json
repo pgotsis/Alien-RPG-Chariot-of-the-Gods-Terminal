@@ -73,14 +73,6 @@
   },
   "accounts": [
     {
-      "id": "public",
-      "name": "Public access",
-      "job": "Open terminal",
-      "clearance": ["public"],
-      "listed": true,
-      "pinHash": "4ebf0ba2170d38a8c1b3bb1432f621f7393444bd75fa031da7ef4c6218d05dc5"
-    },
-    {
       "id": "m-miller",
       "name": "Vanessa Miller",
       "job": "Captain",
@@ -127,6 +119,8 @@
       "name": "Haulage",
       "state": "Derelict",
       "options": "Online;Loaded;Derelict;Offline",
+      "clearance": "public",
+      "level": "CRITICAL",
       "detail": { "company": "Last filed route ends off the company chart." }
     },
     {
@@ -134,6 +128,8 @@
       "name": "Distress beacon",
       "state": "Silent",
       "options": "Silent;Transmitting;Intermittent;Offline",
+      "clearance": "public",
+      "level": "WARNING",
       "detail": { "company": "Beacon log ends mid-transmission. No recovery is confirmed on this table." }
     }
   ],

@@ -164,7 +164,17 @@ function saveStatus(account) {
 }
 
 function saveSystem(system) {
-	patch({ systems: { [system.id]: { name: system.name, state: system.state, options: system.options } } });
+	patch({
+		systems: {
+			[system.id]: {
+				name: system.name,
+				state: system.state,
+				options: system.options,
+				clearance: system.clearance || "crew",
+				level: system.level || "NOTICE"
+			}
+		}
+	});
 }
 
 function choices(system) {
@@ -191,10 +201,39 @@ function addSystem() {
 	const taken = new Set(ship.systems.map((system) => system.id));
 	const options = newOptions.value.trim() || "Offline;Standby;Online";
 	const state = options.split(/[;,]/)[0].trim() || "Offline";
-	patch({ systems: { [slug(name, taken)]: { name: name, state: state, options: options } } }).then(function () {
+	patch({
+		systems: {
+			[slug(name, taken)]: {
+				name: name,
+				state: state,
+				options: options,
+				clearance: "crew",
+				level: "NOTICE"
+			}
+		}
+	}).then(function () {
 		newName.value = "";
 		newOptions.value = "Offline;Standby;Online";
 	});
+}
+
+async function deleteTable() {
+	if (!detail.value) return;
+	const code = detail.value.code;
+	const sure = window.confirm("Delete table " + code + "? This cannot be undone.");
+	if (!sure) return;
+	error.value = "";
+	const response = await fetch("api/gm/tables/" + encodeURIComponent(code), {
+		method: "DELETE",
+		headers: headers()
+	});
+	if (!response.ok) {
+		error.value = "That table could not be deleted.";
+		return;
+	}
+	detail.value = null;
+	loadedComment.value = "";
+	await loadLists();
 }
 
 function removeSystem(system) {
@@ -350,6 +389,7 @@ onUnmounted(function () {
 				<textarea v-model="detail.comment" class="scratch" data-field="comment"></textarea>
 			</label>
 			<button class="term-btn" type="button" @click="saveComment">Save comment</button>
+			<button class="term-btn quiet" type="button" @click="deleteTable">Delete table</button>
 
 			<h2>Ships on this table</h2>
 			<div v-for="ship in detail.catalog" :key="ship.id" class="gm-row">
@@ -398,11 +438,24 @@ onUnmounted(function () {
 				</div>
 
 				<h2>Systems status</h2>
-				<p class="hint">Options are separated by semicolons. The current value is chosen from that list.</p>
+				<p class="hint">Options are separated by semicolons. Clearance is the minimum access that can see the line. Level is NOTICE, WARNING, or CRITICAL.</p>
 				<div v-for="system in selectedShip().systems" :key="system.id" class="gm-row">
 					<input v-model="system.name" type="text" />
 					<select v-model="system.state">
 						<option v-for="option in choices(system)" :key="option" :value="option">{{ option }}</option>
+					</select>
+					<select v-model="system.clearance">
+						<option value="public">public</option>
+						<option value="crew">crew</option>
+						<option value="security">security</option>
+						<option value="research">research</option>
+						<option value="command">command</option>
+						<option value="company">company</option>
+					</select>
+					<select v-model="system.level">
+						<option value="NOTICE">NOTICE</option>
+						<option value="WARNING">WARNING</option>
+						<option value="CRITICAL">CRITICAL</option>
 					</select>
 					<input v-model="system.options" type="text" placeholder="Open;Closed;Locked" />
 					<button class="term-btn" type="button" @click="saveSystem(system)">Save</button>

@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, provide } from "vue";
 import GmView from "./components/GmView.vue";
 import LoginView from "./components/LoginView.vue";
 import MastHead from "./components/MastHead.vue";
-import PinView from "./components/PinView.vue";
+import PublicView from "./components/PublicView.vue";
 import ShellView from "./components/ShellView.vue";
 import StandbyView from "./components/StandbyView.vue";
 import { createTerminal } from "./terminal.js";
@@ -24,8 +24,8 @@ onUnmounted(() => terminal.stop());
 			<MastHead />
 			<p class="error">{{ terminal.state.loginError }}</p>
 		</template>
+		<PublicView v-else-if="terminal.state.mode === 'public'" />
 		<LoginView v-else-if="terminal.state.mode === 'login'" />
-		<PinView v-else-if="terminal.state.mode === 'pin'" />
 		<ShellView v-else />
 	</div>
 </template>

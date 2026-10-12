@@ -183,6 +183,11 @@ async function main() {
 		return tables.patch(request.params.code, request.body)
 	})
 
+	app.delete(basePath + 'api/gm/tables/:code', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.deleteTable(request.params.code)
+	})
+
 	if (barePrefix) {
 		app.get(barePrefix, async function (request, reply) {
 			const query = request.raw.url.includes('?')

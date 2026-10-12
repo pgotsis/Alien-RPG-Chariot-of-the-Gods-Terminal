@@ -73,15 +73,6 @@
   ],
   "accounts": [
     {
-      "id": "public",
-      "name": "Public Access",
-      "shortName": "Public",
-      "job": "Terminal",
-      "clearance": ["public"],
-      "listed": false,
-      "pinHashes": ["c7e4042543ef7de1ca60e5a5b66c2132d35f54d0203f1ccef3f69f5f7b58f92d"]
-    },
-    {
       "id": "j-vargas",
       "name": "Judd Vargas",
       "shortName": "J.Vargas",
@@ -162,24 +153,32 @@
       "id": "lucidite",
       "name": "Lucidite reserves",
       "state": "0%",
+      "clearance": "public",
+      "level": "CRITICAL",
       "detail": { "public": "Spent in the failed xenospace jump." }
     },
     {
       "id": "impulse",
       "name": "Impulse engines",
       "state": "Ruptured",
+      "clearance": "public",
+      "level": "CRITICAL",
       "detail": { "public": "Damaged while fleeing the corpse vessel." }
     },
     {
       "id": "shields",
       "name": "Shields",
       "state": "0%",
+      "clearance": "public",
+      "level": "WARNING",
       "detail": { "public": "Down after the engagement." }
     },
     {
       "id": "xenospace",
       "name": "Xenospace drive",
       "state": "Data loss",
+      "clearance": "public",
+      "level": "CRITICAL",
       "detail": { "public": "Configuration data was lost. The drive is not ready to jump." }
     }
   ]
