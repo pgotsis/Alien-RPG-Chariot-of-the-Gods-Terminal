@@ -4,7 +4,6 @@
   "computer": "MU/TH/UR 2000",
   "salt": "uscss-cronus-muthr-v1",
   "date": "04.20.2112",
-  "logo": "images/Cronos.png",
   "schematicOrder": ["public", "crew", "research", "security", "command", "company"],
   "clearanceInherits": {
     "public": [],
@@ -106,12 +105,12 @@
       "status": "Deceased",
       "lastLogin": "03.19.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f32.jpg"
     },
     {
       "id": "ava",
-      "name": "Ava",
-      "shortName": "Ava",
+      "name": "Ava 6",
+      "shortName": "Ava 6",
       "job": "Synthetic",
       "clearance": ["crew"],
       "status": "Deactivated",
@@ -129,7 +128,7 @@
       "status": "Unaccounted",
       "lastLogin": "03.02.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f25.jpg"
     },
     {
       "id": "m-carter",
@@ -140,7 +139,7 @@
       "status": "Deceased",
       "lastLogin": "03.14.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f21.jpg"
     },
     {
       "id": "l-clayton",
@@ -187,7 +186,7 @@
       "status": "Deceased",
       "lastLogin": "03.16.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f10.jpg"
     },
     {
       "id": "a-johns",
@@ -210,7 +209,7 @@
       "status": "Unaccounted",
       "lastLogin": "03.20.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f09.jpg"
     },
     {
       "id": "w-marshall",
@@ -221,7 +220,7 @@
       "status": "Unaccounted",
       "lastLogin": "03.17.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f12.jpg"
     },
     {
       "id": "a-moreno",
@@ -232,7 +231,7 @@
       "status": "Deceased",
       "lastLogin": "03.17.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f15.jpg"
     },
     {
       "id": "t-nguyen",
@@ -243,7 +242,7 @@
       "status": "Deceased",
       "lastLogin": "03.16.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f29.jpg"
     },
     {
       "id": "v-reid",
@@ -266,7 +265,7 @@
       "status": "Unaccounted",
       "lastLogin": "03.21.2112",
       "listed": true,
-      "photo": "",
+      "photo": "images/generic/f30.jpg",
       "pinHash": "09f65925fe4f11aaed3791dd7d0557d9bcc74788261373c29677ff74006503a0"
     },
     {
@@ -278,7 +277,7 @@
       "status": "Deceased",
       "lastLogin": "03.19.2112",
       "listed": true,
-      "photo": "",
+      "photo": "images/generic/f28.jpg",
       "pinHash": "d9cd4dc6190c5949f11a4edc7fc7548d85b74c042baec23d20afd10f58d5f592"
     },
     {
@@ -290,7 +289,7 @@
       "status": "Deceased",
       "lastLogin": "03.20.2112",
       "listed": true,
-      "photo": "",
+      "photo": "images/generic/f08.jpg",
       "pinHash": "113758552f2a6247f724b809babb6b0edf2aa206064fbca3a90f57cc4c7f6b8a"
     },
     {
@@ -302,7 +301,7 @@
       "status": "Unaccounted",
       "lastLogin": "03.18.2112",
       "listed": true,
-      "photo": ""
+      "photo": "images/generic/f11.jpg"
     },
     {
       "id": "s-park",

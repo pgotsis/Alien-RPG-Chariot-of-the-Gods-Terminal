@@ -82,19 +82,43 @@
     },
     {
       "id": "m-miller",
-      "name": "Miller",
+      "name": "Vanessa Miller",
       "job": "Captain",
       "clearance": ["command"],
       "status": "Unaccounted",
-      "listed": false
+      "listed": true
     },
     {
       "id": "m-davis",
-      "name": "Davis",
+      "name": "Leah Davis",
       "job": "Pilot",
       "clearance": ["crew"],
       "status": "Deceased",
-      "listed": false
+      "listed": true
+    },
+    {
+      "id": "k-rye",
+      "name": "Kayla Rye",
+      "job": "Roughneck",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
+    },
+    {
+      "id": "l-cham",
+      "name": "Lyron Cham",
+      "job": "Technician",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
+    },
+    {
+      "id": "j-wilson",
+      "name": "John J. Wilson",
+      "job": "Company agent",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
     }
   ],
   "systems": [
