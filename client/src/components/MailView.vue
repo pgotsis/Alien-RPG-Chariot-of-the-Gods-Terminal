@@ -40,7 +40,7 @@ const messages = computed(() => (
 ));
 
 const open = computed(() => (
-	(terminal.state.ship.mail || []).find((message) => message.id === terminal.state.openMailId) || null
+	messages.value.find((message) => message.id === terminal.state.openMailId) || null
 ));
 
 function count(folder) {
