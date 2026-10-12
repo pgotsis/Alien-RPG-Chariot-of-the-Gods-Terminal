@@ -431,7 +431,7 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 .gm-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.75rem; align-items: start; margin-bottom: 0.75rem; }
 .gm-fields > label { min-width: 0; }
 .gm-fields input, .gm-fields select, .gm-fields textarea { max-width: none; min-width: 0; box-sizing: border-box; }
-.gm-fields select[multiple] { min-height: 5rem; }
+
 .gm-section .panel { margin-bottom: 1rem; }
 .gm-section details { margin-bottom: 0.75rem; }
 .gm-section summary { cursor: pointer; padding: 0.5rem 0; }
@@ -452,3 +452,35 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 	.gm-editor { grid-template-columns: 1fr; }
 	.gm-sidebar { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Compact GM forms; keep the player terminal's spacing unchanged. */
+.gm { font-size: 0.875rem; }
+.gm h1 { margin-block: 0.5rem; }
+.gm h2 { margin-block: 0.6rem; font-size: 1.15rem; }
+.gm h3 { margin-block: 0.4rem; font-size: 1rem; }
+.gm h4, .gm p { margin-block: 0.5rem; }
+.gm .term-btn { padding: 0.45rem 0.6rem; font-size: 0.8rem; min-height: 2.2rem; }
+.gm input, .gm select, .gm textarea { padding: 0.35rem 0.45rem; margin-block: 0.2rem; font: inherit; }
+.gm-editor { grid-template-columns: 11rem minmax(0, 1fr); gap: 1rem; }
+.gm-sidebar { gap: 0.3rem; }
+.gm-sidebar .term-btn { white-space: nowrap; }
+.gm-fields { gap: 0.5rem; margin-bottom: 0.5rem; }
+.gm-section .panel { padding: 0.65rem; margin-bottom: 0.6rem; }
+.gm-section .actions { gap: 0.4rem; }
+.gm-crew-card { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: end; }
+.gm-crew-card .gm-fields { flex: 1 1 36rem; margin: 0; grid-template-columns: 1.25fr 1.1fr 0.9fr 1fr 1fr; }
+.gm-crew-card .gm-portrait { width: 2.8rem; height: 2.8rem; margin: 0 0 0.2rem; }
+.gm-clearance-select { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; }
+.gm-clearance-select > select { flex: 1 1 0; width: 0; min-width: 0; }
+.gm-clearance-select > .gm-extra-clearance { flex-basis: 100%; }
+.gm .gm-add-clearance { flex: 0 0 1.6rem; min-height: 1.9rem; padding: 0.2rem; font-size: 1rem; }
+.gm-section .scratch { min-height: 5rem; }
+.gm-section .gm-row input { width: auto; max-width: 100%; }
+@media (max-width: 1000px) {
+	.gm-crew-card .gm-fields { grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
+}
+@media (max-width: 800px) {
+	.gm-editor { grid-template-columns: 1fr; }
+	.gm-sidebar .term-btn { white-space: normal; }
+}
+.terminal:has(> .gm) { max-width: 1440px; }

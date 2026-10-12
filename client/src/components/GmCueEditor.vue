@@ -1,4 +1,5 @@
 <script setup>
+import GmClearanceSelect from "./GmClearanceSelect.vue";
 import { ref, watch } from "vue";
 const props = defineProps({ ship: Object });
 const emit = defineEmits(["patch"]);
@@ -19,7 +20,6 @@ const blank = () => ({
 	log: { enabled: false, text: "", time: "", clearance: ["crew"] },
 });
 const draft = ref(blank());
-const clearances = ["public", "crew", "security", "research", "command", "company"];
 const statuses = [
 	"Aboard",
 	"Cryo",
@@ -233,10 +233,7 @@ function systemChoices(id) {
 								v-model="draft[field].time"
 								maxlength="200"
 								placeholder="2183-11-12 14:30" /></label
-						><label
-							>Visibility<select v-model="draft[field].clearance" multiple required>
-								<option v-for="tag in clearances" :key="tag">{{ tag }}</option>
-							</select></label
+						><label>Visibility<GmClearanceSelect v-model="draft[field].clearance" required /></label
 						><label v-if="field !== 'log'"
 							>From<select v-model="draft[field].from" :required="field === 'mail'">
 								<option value="">Unspecified</option>

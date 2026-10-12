@@ -143,7 +143,7 @@
       "id": "montero-departure",
       "time": "11-11-2183",
       "clearance": ["company"],
-      "text": "Montero departed under company charter. Auditor copy filed."
+      "text": "Montero departed under company charter."
     },
     {
       "id": "montero-beacon",
@@ -152,23 +152,6 @@
       "text": "Distress beacon received, then lost."
     }
   ],
-  "mail": [
-    {
-      "id": "montero-charter",
-      "subject": "Charter amendment",
-      "from": "wy-corporate",
-      "to": "s-park",
-      "time": "11-10-2183",
-      "body": "Auditor Park may open Montero records from a company terminal. What you see is this table's copy. Another table's status is not yours."
-    }
-  ],
-  "notes": [
-    {
-      "id": "montero-note",
-      "owner": "s-park",
-      "title": "Montero follow-up",
-      "time": "12-11-2183",
-      "body": "Match the beacon cutoff to the ship whose terminal opened this packet. Do not carry another table's roster across."
-    }
-  ]
+  "mail": [],
+  "notes": []
 }

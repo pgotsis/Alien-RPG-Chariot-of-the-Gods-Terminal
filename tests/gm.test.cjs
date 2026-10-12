@@ -280,3 +280,53 @@ test('prepared events stay private until pushed and apply multiple changes atomi
 	f.tables.patch(code, { deleteCue: cue.id })
 	assert(!f.tables.gmDetail(code).ships[0].cues.some((c) => c.id === cue.id))
 })
+
+test('scenario defaults contain no Park account, credentials or records, and Cronus does not attach an auditor packet', (t) => {
+	const f = fixture(t)
+	for (const id of ['cronus', 'montero']) {
+		const template = fs.readFileSync(path.join(root, 'data', id, 'ship.json'), 'utf8')
+		const pins = fs.readFileSync(path.join(root, 'gm', id, 'pins.json'), 'utf8')
+		assert(!/s-park|S\. Park|Auditor Park/.test(template))
+		assert(!/s-park/.test(pins))
+		const { code } = f.tables.createTable(id)
+		assert(!JSON.stringify(f.tables.readTable(code)).includes('s-park'))
+		if (id === 'cronus')
+			assert.deepEqual(
+				f.tables.gmDetail(code).ships.map((ship) => ship.id),
+				['cronus'],
+			)
+	}
+})
+
+test('star map backgrounds persist, sync to players, can be cleared, and reject invalid image data', (t) => {
+	const f = fixture(t)
+	const { code } = f.tables.createTable('montero')
+	const map = f.tables.gmDetail(code).ships[0].starMap
+	const png =
+		'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='
+	f.tables.patch(code, {
+		starMap: { ...map, background: png, backgroundOpacity: 0.5, backgroundFit: 'cover' },
+	})
+	f.restart()
+	assert.equal(f.tables.readState(code).starMap.background, png)
+	assert.equal(f.tables.readState(code).starMap.backgroundOpacity, 0.5)
+	assert.equal(f.tables.gmDetail(code).ships[0].starMap.backgroundFit, 'cover')
+	for (const background of [
+		'javascript:alert(1)',
+		'data:image/svg+xml;base64,PHN2Zy8+',
+		'data:image/png;base64,aGVsbG8=',
+	]) {
+		assert.throws(
+			() => f.tables.patch(code, { starMap: { ...map, background } }),
+			/background|Background|Image/,
+		)
+	}
+	assert.throws(
+		() => f.tables.patch(code, { starMap: { ...map, backgroundOpacity: 2 } }),
+		/opacity/,
+	)
+	f.tables.patch(code, { starMap: { ...map, background: 'https://example.com/map.png' } })
+	assert.equal(f.tables.readTable(code).ship.starMap.background, 'https://example.com/map.png')
+	f.tables.patch(code, { starMap: { ...map, background: '' } })
+	assert.equal(f.tables.readState(code).starMap.background, '')
+})

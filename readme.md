@@ -1,3 +1,67 @@
+# What it is
+
+An interactive ship-computer terminal for the **ALIEN Roleplaying Game**, built around **Chariot of the Gods**. Players use crew access cards or PINs to explore ship records, mail, personnel, systems and deck blueprints. The GM manages each group's ships and story changes from a separate desk. The interface keeps the green-screen MU/TH/UR presentation and works on phones, tablets and desktop computers.
+
+Original sources:
+
+- [DapperDaveW's original terminal on Experimental Gamer](https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/)
+- [MaciejLisCK's upstream repository](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal)
+
+## Implemented in this fork compared with upstream main
+
+The comparison below uses upstream [`main` at `fff6cf5`](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/commit/fff6cf5bd2f72cb3aba9bd5ceb5f489665c55ce7). Upstream provides a static HTML/JavaScript terminal with crew mail, access codes, interactive maps and supporting assets. This fork retains and reorganizes that material while adding the following application features and development workflow.
+
+### Application and presentation
+
+- Rebuilt the terminal as a Vue application with separate views and reusable components, bundled with Vite.
+- Added responsive layouts for phones, tablets and desktops, including the personnel rolodex and centered numeric keypad with equal-height login panels.
+- Replaced the fixed ship branding with the selected ship's name and computer designation: MU/TH/UR 2000 on Cronus and MU/TH/UR 6500 on Montero.
+- Added crew portraits and an initials fallback for accounts without a usable image.
+- Added a standby screen when no table code is supplied, a public terminal view, and clearance-aware navigation between application sections.
+
+### Persistent tables and multiple ships
+
+- Added a Node.js 24/Fastify backend and SQLite storage for each table's live state.
+- Added six-character table codes and player links that select a specific group's copy of the scenario.
+- Added scenario templates for Cronus, Montero and Astraeus, plus a Chariot of the Gods preset containing Montero and Cronus. Each ship has its own computer, roster and records.
+- Added a configurable home ship, ship membership and individual player-access controls. Other ships can remain closed until the GM opens them.
+- Added player switching between open ship computers and transfer of personal mail and station notes between ships. Ship systems, logs and blueprints remain with their ship.
+- Added automatic polling, approximately every five seconds, to distribute changes and notify stations of updated sections. Table state survives server restarts; station login and viewed-item state remain in the browser.
+
+### Personnel, access cards and mail
+
+- Added PINs for all 18 listed Cronus crew and all five Montero crew, including people without existing mail or other personal content.
+- Set Montero's default roster status to Aboard and its titles to Captain, Pilot, Technician, Cargo Handler and Corporate Liaison.
+- Added salted SHA-256 PIN hashes and separate GM PIN-reference files. Table-specific PIN overrides replace an account's previous code without rewriting scenario defaults.
+- Added editable crew names, titles, statuses and clearances, status dropdowns, and creation of additional crew members with PINs and a choice of unused portraits.
+- Added live roster and PIN updates on the login screen. Personnel status is omitted from the login rolodex while remaining available in the personnel views according to clearance.
+- Added data-driven clearance inheritance, module grants, restricted visitor accounts, clearance-specific descriptions and classified roster details.
+- Limited mailbox selection to the signed-in user's own account, preserving permitted crew broadcasts. Added message composition and persistent personal station notes.
+
+### GM desk and adventure editing
+
+- Added a GM-token-protected desk, table list, create-table configuration view, table deletion from the list, and a separate table-editing view.
+- Added a vertical section sidebar and ship-name selectors for the table editor.
+- Added table comments, ship/access management, crew and PIN editing, and personal-data transfer controls.
+- Added system creation, editing and removal, with compact fields for state, visibility and severity. Suggested names populate scenario-specific or common ship-system presets, including state choices and adventure descriptions.
+- Added editors for every existing scenario log, announcement and mail entry, alongside new entries. Dates, text and visibility can be changed, and entries can be removed.
+- Separated public announcements from mail. Public/crew broadcasts and announcement clearance determine which transmissions appear in the terminal's corresponding views.
+- Added prepared events containing announcements, mail, dated log entries, system changes and roster changes. Events can be saved and edited before play, previewed and pushed in one action; all changes apply in a single transaction, with the last-pushed time recorded.
+
+### Blueprints, navigation and scenario records
+
+- Added table-specific blueprint editing: overview and deck image layers by clearance, deck names and dimensions, room hotspots, room descriptions and access requirements.
+- Added selection of bundled blueprint images or HTTPS image URLs while retaining the original interactive deck-map material.
+- Added a command/company Star map with an editable ship position, named waypoints, dates and navigation notes. It uses a schematic coordinate grid; the position remains unconfirmed until the GM enters it. Existing visitor restrictions still apply.
+- Organized scenario content into ship templates, clearance-aware files, logs, notes and tasks. Retained legacy Astraeus media and puzzle scripts as scenario material; the current terminal lists tasks but does not execute those legacy procedures.
+
+### Running, deployment and validation
+
+- Added locked npm dependency installation, a production frontend build, and a Vite development server with an API proxy.
+- Added environment-based configuration for port, data directory, GM authentication and URL prefix; health checks; structured logs; graceful shutdown; and support for deployment behind an HTTPS reverse proxy under a path prefix.
+- Kept runtime database files, GM PIN-reference files and archived scenario scripts outside the served frontend.
+- Added automated GM tests covering scenario defaults, PINs and clearances, table isolation, persistence, new crew and portraits, personal-data transfer, document editing, blueprints, navigation and atomic prepared events.
+
 # Run
 
 Node.js 24 is required (`engines` in `package.json`).
@@ -75,83 +139,34 @@ The GM desk has a table list and a separate editor with a section sidebar. Selec
 
 Systems offer adventure presets, editable state choices, severity, visibility and clearance-specific descriptions. Logs, announcements and mail include the original scenario entries and can be edited, added or removed with an adventure date. Announcements and mail are separate: public announcements require `public` visibility; crew/public mail recipients are broadcasts.
 
-Blueprints allow image layers per clearance, deck dimensions, room hotspots and room descriptions. Choose an existing image or an HTTPS image URL. The command/company Star map is a schematic navigation grid with editable ship position and waypoints, not an astronomical chart. Its position starts unconfirmed until the GM sets it.
+Blueprints allow image layers per clearance, deck dimensions, room hotspots and room descriptions. Choose an existing image or an HTTPS image URL. The command/company Star map is a schematic navigation grid with editable ship position and waypoints, not an astronomical chart. Its position starts unconfirmed until the GM sets it. The GM can set a background using an HTTPS image URL or upload a PNG, JPEG or WebP image up to 2 MB, then adjust its fit and opacity. Uploaded backgrounds are stored with the table.
 
 Prepared events save transmissions, dated log entries, system changes and roster changes ahead of play. Saving does not send anything. **Push event** applies all changes in one transaction; a rejected change leaves the event unapplied. Events remain available for editing and reuse, and show when they were last pushed. Pushing a transmission again creates another entry.
 
 All table edits and prepared events persist in `DATA_DIR/app.sqlite`. New tables use the current scenario defaults; existing table statuses are preserved. Run `npm test` for the GM persistence and editing checks.
 
-# Demo
-https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/
-
-The terminal stands by until a table code is in the URL. `?table=CODE` loads that table's copy of a scenario. `?gm` is the GM desk. A card still signs straight in with `?table=CODE&code=` — that URL is what a QR code should encode. Pins are stored as salted SHA-256 hashes. The plaintext list for printing cards is `gm/cronus/pins.json`, which the terminal never loads. S. Park's 8-digit company override is in that file too, and it is the same on every Cronus table.
-
-Set `photo` on an account to an image path to show a portrait. `classifiedStatus` is shown only to clearances marked `rosterDetail`. A visitor account uses `external`, `listed: false`, and `restrictTo` for a limited pass.
-
-Public access (players may try an obvious code): [1111](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=1111) or [1234](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=1234).
-
 # Languages
-* [English](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/tree/main) on main branch.
-* [Polish](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/tree/feature/polish-language)
-* [German](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/tree/feature/german-language)
 
-# Informations
-This is a copy of [the site](https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal)
+The upstream project maintains [English on main](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/tree/main), [Polish](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/tree/feature/polish-language) and [German](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal/tree/feature/german-language) branches. These are references to upstream translations; the rewritten application in this fork is currently in English.
 
-The [original post](https://www.reddit.com/r/alienrpg/comments/seyrii/spoiler_chariot_of_the_gods_cronus_crew_access/) by [DapperDaveW](https://www.reddit.com/user/DapperDaveW/)
+# History and credits
 
-Some of scripts and content may be missing/different then on the site, since there is no easy way to download all.
-Code is extremely difficult to maintain.
+## DapperDaveW's original game aid
 
+The project began with **[DapperDaveW](https://www.reddit.com/user/DapperDaveW/)** and the [Cronus crew email supplement](https://www.reddit.com/r/alienrpg/comments/se3w5x/spoiler_chariot_of_the_gods_crew_emails_supplement/) written for Chariot of the Gods. Those fictional emails expanded the crew's relationships and events aboard the Cronus, giving players additional information to discover during the adventure.
 
-# Access shortcuts
-Idea is there are access codes that could be found on different places, so players can access terminal with code. Below there are shortcuts to access those codes.
+DapperDaveW then created an online access-card and email interface using JavaScript and CSS, hosted on [Experimental Gamer](https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/). The [original announcement on r/alienrpg](https://www.reddit.com/r/alienrpg/comments/seyrii/spoiler_chariot_of_the_gods_cronus_crew_access/) describes the intended play experience: players find a crew member's access card, scan its QR code or follow its link, and read that person's mail on a phone or at a shared computer representing an in-game terminal.
 
-* [Public - code: 1111](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=1111)
-* [C.Reynolds - code: 8654](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=8654)
-* [A. Johns - code: 1987](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=1987)
-* [V. Reid - code: 2654](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=2654)
-* [D. Cooper - code: 4987](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=4987)
-* [L. Flynn - code: 3321](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=3321)
-* [L.Clayton - code: 9321](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=9321)
-* [Ava - code: 5654](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=5654)
-* [R.Walker - code: 6321](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=6321)
-* [E.Tenwick - code: 7987](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/index.html?code=7987)
+The GM decided where those physical cards would appear. DapperDaveW suggested that living crew retain their cards, with other cards discoverable at adventure locations associated with their owners. The post also described plans for security-only maps, scientific records, command information and company-only material. These access-card interactions, the original crew-email material and the terminal presentation are credited to DapperDaveW. The original post remains the source for its specific interpretations of the adventure; they should not be mistaken for new writing by this fork's maintainer.
 
-# Other materials
-* [Alternative Map for Players](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/images//USCSSCronusPlayerMap.png)
-* [Alternative Map for GM(Mother)](https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/images//USCSSCronusGMMap.png)
-* [Combat flow charts](https://imgur.com/a/alien-rpg-combat-flowcharts-v2-HeIA1Pt)
+## MaciejLisCK's repository
 
-# Original post on reddit
->TL;DR Log on to the access terminal as Security Officer Clark Reynolds to try it out: https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=8654
->
->This is a follow up to the Cronus Crew emails I wrote in an earlier thread (https://www.reddit.com/r/alienrpg/comments/se3w5x/spoiler_chariot_of_the_gods_crew_emails_supplement/). I have now built an online access card and email interface system using javascript and CSS supplement to use with Chariot of the Gods.
->
->**How Does It Work** Members of the Cronus crew have personal access cards allowing them to check their emails at access terminals on the ship (later I will show how these access cards can unlock doors and access other ship sensitive data)
->
->**Do I have to Download Something?** No, the system is hosted on my web space. Just provide the QR codes or links to your players when their characters find the "access cards." Then they can view that user's terminal access using their mobile devices. Or you can alternatively just use a computer.
->
->**QR Codes** The system uses QR codes which contain a url and an id code for that user. You can view the QR codes here. https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/QRCodeImage.png
->So you can print and cut these out to make little access cards. In the future I will make nicer looking cards. Players can use their phones to follow the QR code and automatically log into that NPCs account (although their character must be at an "access terminal" on the ship)
->If you don't want to use QR codes you can just follow these links directly:
-> * A. Johns https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=1987
-> * V. Reid https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=2654
-> * L. Flynn https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=3321
-> * D. Cooper https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=4987
-> * Ava https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=5654
-> * R.Walker https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=6321
-> * E.Tenwick https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=7987
-> * C.Reynolds https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=8654
-> * L.Clayton https://www.experimentalgamer.com/AlienRPG/ChariotOfTheGods/Terminal/index.html?id=9321
->
->**Where Are These Access Cards Found?**
->-It's up to the GM but I suggest that all living characters still possess their cards.
->-Captain Richard Walker's card is found near the Abomination in the Metapod (this abomination, I decided, is what remains of the good captain. As you can see from the email exchanges)
->-C. Reynolds is found on the "headless man" reference in GM material - likely the first dead body the players encounter.
->-Emily Tenwick's card can also be found in a science lab, or anywhere you feel she met her demise.
->
->**What's Next** Next I want to create an interactive security map of the ship that can be accessed by only security members (Reynolds, Reid). Then science data from Researchers, operation data from commanders and finally Company only data for Clayton.
->
->**EDIT:** I now see that I've been calling the Cronus the "Cronos". Likely other mistakes to fix as well.
->
+**[MaciejLisCK](https://github.com/MaciejLisCK)** preserved and adapted the hosted terminal in the [upstream Alien-RPG-Chariot-of-the-Gods-Terminal repository](https://github.com/MaciejLisCK/Alien-RPG-Chariot-of-the-Gods-Terminal). That project made the terminal available as a static site and included crew-access links, pictures, sounds, interactive deck maps and references to translated branches. Its development history includes access-code handling, additional content, map improvements and README contributions.
+
+The upstream README explicitly described its copy as potentially incomplete or different from the original website because not all scripts and content could be downloaded easily. This fork inherits that preservation history. Credit for the original website and writing belongs to DapperDaveW; credit for the repository adaptation and its subsequent upstream contributions belongs to MaciejLisCK and the upstream contributors. Inclusion of an inherited asset here does not imply that it was created by this fork.
+
+## This fork
+
+**[pgotsis/Alien-RPG-Chariot-of-the-Gods-Terminal](https://github.com/pgotsis/Alien-RPG-Chariot-of-the-Gods-Terminal)** continues that work as a running application for GM-managed sessions. It replaces the static interface with Vue, adds a Fastify backend and persistent SQLite tables, separates ship/scenario data from application code, and adds the live editing, roster, blueprint, navigation and prepared-event features listed above.
+
+The **ALIEN Roleplaying Game** and **Chariot of the Gods** are published by [Free League Publishing](https://freeleaguepublishing.com/) under license for the ALIEN setting. Credit for the setting and adventure remains with their respective creators and rights holders. This repository is a fan-made game aid built on those works and on the community contributions credited above.
