@@ -217,7 +217,18 @@ function toggleShip(id, on) {
 }
 
 function makeHome(id) {
+	if (detail.value && detail.value.homeShip === id) return;
 	patch({ home: id });
+}
+
+function shipAccess(id) {
+	const ship = ((detail.value && detail.value.ships) || []).find((item) => item.id === id);
+	return Boolean(ship && ship.playerAccess);
+}
+
+function toggleAccess(id) {
+	if (!detail.value) return;
+	patch({ access: { [id]: !shipAccess(id) } });
 }
 
 function saveComment() {
@@ -330,7 +341,7 @@ onUnmounted(function () {
 
 		<template v-if="detail">
 			<h2>{{ detail.name }}  {{ detail.code }}</h2>
-			<p class="hint">Players land on {{ detail.computer }} unless a ship link is used.</p>
+			<p class="hint">Players start on the home computer. Close a computer when that ship is lost. Other computers stay closed until you open them.</p>
 			<p class="player-url"><a :href="playerUrl(detail.code)">{{ playerUrl(detail.code) }}</a></p>
 			<p class="meta">Created {{ when(detail.createdAt) }} · Player {{ when(detail.playerSeenAt) }} · GM {{ when(detail.gmSeenAt) }}</p>
 			<p class="hint">{{ addedText(detail.added) }}</p>
@@ -357,7 +368,14 @@ onUnmounted(function () {
 					type="button"
 					@click="makeHome(ship.id)"
 				>{{ detail.homeShip === ship.id ? "Home computer" : "Make home" }}</button>
-				<a v-if="shipOn(ship.id)" :href="playerUrl(detail.code, ship.id)">Link</a>
+				<button
+					v-if="shipOn(ship.id)"
+					class="term-btn"
+					:class="{ on: shipAccess(ship.id) }"
+					type="button"
+					@click="toggleAccess(ship.id)"
+				>{{ shipAccess(ship.id) ? "Close to players" : "Open to players" }}</button>
+				<a v-if="shipOn(ship.id) && shipAccess(ship.id)" :href="playerUrl(detail.code, ship.id)">Link</a>
 			</div>
 
 			<div class="folder-row">

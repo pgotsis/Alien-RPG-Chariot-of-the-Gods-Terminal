@@ -254,7 +254,17 @@ export function createTerminal() {
 
 	async function pullShared() {
 		if (!state.tableCode || pulling) return;
+		if (!state.ship || state.mode === "error") {
+			pulling = true;
+			try {
+				await enterOpenComputer();
+			} finally {
+				pulling = false;
+			}
+			return;
+		}
 		pulling = true;
+		let closedUnderfoot = false;
 		try {
 			const headers = {};
 			if (state.session.overrideToken) headers["X-Override-Token"] = state.session.overrideToken;
@@ -263,19 +273,73 @@ export function createTerminal() {
 				cache: "no-store",
 				headers: headers
 			});
-			if (!response.ok) return;
-			const shared = await response.json();
-			if (shared.shipId && state.ship && shared.shipId !== state.ship.id) return;
-			if (Array.isArray(shared.ships)) state.ships = shared.ships;
-			if (shared.homeShip) state.homeShip = shared.homeShip;
-			const same = shared.revision === state.revision;
-			state.revision = shared.revision;
-			state.pulses = shared.pulses || [];
-			if (!same) applySharedState(state.ship, shared);
-			if (state.session.overrideToken && shared.packet) state.packet = shared.packet;
+			if (response.status === 403) {
+				closedUnderfoot = true;
+			} else if (response.ok) {
+				const shared = await response.json();
+				if (!(shared.shipId && state.ship && shared.shipId !== state.ship.id)) {
+					if (Array.isArray(shared.ships)) state.ships = shared.ships;
+					if (shared.homeShip) state.homeShip = shared.homeShip;
+					const same = shared.revision === state.revision;
+					state.revision = shared.revision;
+					state.pulses = shared.pulses || [];
+					if (!same) applySharedState(state.ship, shared);
+					if (state.session.overrideToken && shared.packet) state.packet = shared.packet;
+				}
+			}
 		} finally {
 			pulling = false;
 		}
+		if (closedUnderfoot) await enterOpenComputer();
+	}
+
+	async function applyComputer(data) {
+		state.ship = data.ship;
+		state.ships = data.ships || [];
+		state.homeShip = data.homeShip || state.homeShip;
+		state.revision = data.revision;
+		state.pulses = data.pulses || [];
+		state.packet = null;
+		state.module = "home";
+		state.pin = "";
+		state.loginError = "";
+		document.title = (state.ship.computer || "MU/TH/UR") + " — " + (state.ship.name || "Terminal");
+		const url = new URL(location.href);
+		url.searchParams.set("table", state.tableCode);
+		url.searchParams.set("ship", state.ship.id);
+		history.replaceState(null, "", url);
+		state.session = loadHere();
+		if (state.session.overrideToken) await pullShared();
+		if (state.session.accountId && accountById(state.ship, state.session.accountId)) {
+			setAccount(accountById(state.ship, state.session.accountId));
+		} else {
+			state.account = null;
+			state.grants = null;
+			state.mode = "login";
+		}
+	}
+
+	async function enterOpenComputer() {
+		const response = await fetch("api/tables/" + encodeURIComponent(state.tableCode), { cache: "no-store" });
+		if (response.status === 403) {
+			state.ship = null;
+			state.ships = [];
+			state.account = null;
+			state.grants = null;
+			state.mode = "error";
+			state.loginError = "This computer is closed.";
+			document.title = "MU/TH/UR";
+			const url = new URL(location.href);
+			url.searchParams.delete("ship");
+			history.replaceState(null, "", url);
+			return;
+		}
+		if (!response.ok) return;
+		const data = await response.json();
+		if (!data.ship) return;
+		if (state.ship && state.ship.id === data.ship.id && state.mode !== "error") return;
+		save();
+		await applyComputer(data);
 	}
 
 	async function sendMail(to, subject, body) {
@@ -355,10 +419,21 @@ export function createTerminal() {
 			document.title = "MU/TH/UR 2000";
 			return;
 		}
+		const requested = params.get("ship");
 		try {
-			const requested = params.get("ship");
-			const address = "api/tables/" + encodeURIComponent(code) + (requested ? "?ship=" + encodeURIComponent(requested) : "");
-			const response = await fetch(address, { cache: "no-store" });
+			let response = await fetch(
+				"api/tables/" + encodeURIComponent(code) + (requested ? "?ship=" + encodeURIComponent(requested) : ""),
+				{ cache: "no-store" }
+			);
+			if (response.status === 403) {
+				response = await fetch("api/tables/" + encodeURIComponent(code), { cache: "no-store" });
+			}
+			if (response.status === 403) {
+				state.tableCode = code;
+				state.mode = "error";
+				state.loginError = "This computer is closed.";
+				return;
+			}
 			if (!response.ok) throw new Error("missing");
 			const data = await response.json();
 			state.tableCode = data.code;
@@ -373,6 +448,11 @@ export function createTerminal() {
 			return;
 		}
 		document.title = (state.ship.computer || "MU/TH/UR") + " — " + (state.ship.name || "Terminal");
+		if (requested && requested !== state.ship.id) {
+			const url = new URL(location.href);
+			url.searchParams.set("ship", state.ship.id);
+			history.replaceState(null, "", url);
+		}
 		state.session = loadHere();
 		if (state.session.overrideToken) await pullShared();
 		const card = params.get("code");
@@ -391,37 +471,18 @@ export function createTerminal() {
 	}
 
 	async function connectShip(shipId) {
-		if (!state.tableCode || !shipId || (state.ship && state.ship.id === shipId)) return;
+		if (!state.tableCode || !shipId) return;
+		if (state.ship && state.ship.id === shipId && state.mode !== "error") return;
 		save();
 		const response = await fetch(
 			"api/tables/" + encodeURIComponent(state.tableCode) + "?ship=" + encodeURIComponent(shipId),
 			{ cache: "no-store" }
 		);
-		if (!response.ok) return;
-		const data = await response.json();
-		state.ship = data.ship;
-		state.ships = data.ships || [];
-		state.homeShip = data.homeShip || state.homeShip;
-		state.revision = data.revision;
-		state.pulses = data.pulses || [];
-		state.packet = null;
-		state.module = "home";
-		state.pin = "";
-		state.loginError = "";
-		document.title = (state.ship.computer || "MU/TH/UR") + " — " + (state.ship.name || "Terminal");
-		const url = new URL(location.href);
-		url.searchParams.set("table", state.tableCode);
-		url.searchParams.set("ship", state.ship.id);
-		history.replaceState(null, "", url);
-		state.session = loadHere();
-		if (state.session.overrideToken) await pullShared();
-		if (state.session.accountId && accountById(state.ship, state.session.accountId)) {
-			setAccount(accountById(state.ship, state.session.accountId));
-		} else {
-			state.account = null;
-			state.grants = null;
-			state.mode = "login";
+		if (!response.ok) {
+			if (response.status === 403) play("accessdenied.mp3");
+			return;
 		}
+		await applyComputer(await response.json());
 	}
 
 	async function transferPersonal(toShipId) {
