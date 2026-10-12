@@ -68,6 +68,9 @@
     { "id": "logs", "label": "Logs" }
   ],
   "tasks": [],
+  "contacts": [
+    { "id": "wy-corporate", "name": "Weyland-Yutani Dispatch" }
+  ],
   "directories": {
     "crew": "Cronus crew",
     "wy-corporate": "Weyland-Yutani Corporate"
@@ -312,6 +315,8 @@
       "homeShip": "USCSS Montero",
       "photo": "",
       "pinHash": "8e6651210a83c1d077f12bdb27cb062d7506a1656be502dc1071d2d4e35b19d0",
+      "overrideHash": "60905a19c3f718949661690fbf313f0011d2b413afeb6b75a124db1b5d659c44",
+      "packetShip": "montero",
       "restrictTo": {
         "modules": ["map", "personnel", "status", "logs"],
         "mail": [],

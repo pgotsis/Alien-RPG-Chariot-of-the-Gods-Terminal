@@ -15,6 +15,9 @@
 		"l-clayton": "9321",
 		"s-park": "7042"
 	},
+	"overrides": {
+		"s-park": "48193726"
+	},
 	"codes": {
 		"ava-reactivation": "B833J99"
 	}

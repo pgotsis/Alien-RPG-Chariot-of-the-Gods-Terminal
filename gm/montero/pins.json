@@ -1,0 +1,7 @@
+{
+  "ship": "montero",
+  "salt": "uscss-montero-v1",
+  "pins": {
+    "public": ["1111"]
+  }
+}
