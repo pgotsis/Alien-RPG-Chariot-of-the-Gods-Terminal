@@ -102,25 +102,12 @@ function accountById(ship, id) {
 }
 
 function mailArchives(ship, account, grants) {
-	const ids = new Set();
-	(grants.mail || []).forEach(function (token) {
-		if (token === "self") ids.add(account.id);
-		if (token.indexOf("account:") === 0) ids.add(token.slice("account:".length));
-		if (token.indexOf("clearance:") === 0) {
-			const tag = token.slice("clearance:".length);
-			(ship.accounts || []).forEach(function (other) {
-				if (other.external || other.id === "public") return;
-				if ((other.clearance || []).indexOf(tag) !== -1) ids.add(other.id);
-			});
-		}
-	});
-	return [...ids].filter(function (id) {
-		const other = accountById(ship, id);
-		return other && other.id !== "public";
-	});
+	if (!account || account.id === "public" || !accountById(ship, account.id)) return [];
+	return (grants.mail || []).indexOf("self") !== -1 ? [account.id] : [];
 }
 
 function messagesFor(ship, archiveId, folder, viewer, grants) {
+	if (mailArchives(ship, viewer, grants).indexOf(archiveId) === -1) return [];
 	return (ship.mail || []).filter(function (message) {
 		if (folder === "inbox") {
 			if (message.to === archiveId) return true;

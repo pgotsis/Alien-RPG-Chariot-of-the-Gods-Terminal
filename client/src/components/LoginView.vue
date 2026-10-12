@@ -50,7 +50,6 @@ function step(delta) {
 				<AvatarMark :account="selected" large />
 				<h2>{{ selected.name }}</h2>
 				<p class="job">{{ selected.job || "" }}</p>
-				<p v-if="selected.status" class="meta">{{ selected.status }}</p>
 				<div class="rolodex-nav">
 					<button class="term-btn" type="button" :disabled="people.length < 2" @click="step(-1)">Prev</button>
 					<span class="meta">{{ index + 1 }} / {{ people.length || 1 }}</span>
