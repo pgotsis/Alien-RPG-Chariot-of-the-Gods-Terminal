@@ -5,15 +5,12 @@ import {
 	accountForPin,
 	grantsFor
 } from "./lib/access.js";
-import { applySharedState, loadSharedState } from "./lib/shared.js";
+import { applySharedState } from "./lib/shared.js";
 import { emptySession, loadSession, resetSession, saveSession } from "./lib/session.js";
 
-function scenarioRequest() {
-	const params = new URLSearchParams(location.search);
-	const data = params.get("data");
-	if (data) return data;
-	const ship = params.get("ship") || "cronus";
-	return "api/ships/" + encodeURIComponent(ship);
+function tableCode() {
+	const value = new URLSearchParams(location.search).get("table") || "";
+	return value.trim().toUpperCase();
 }
 
 export function createTerminal() {
@@ -39,7 +36,14 @@ export function createTerminal() {
 		openTaskId: null,
 		fileCode: "",
 		fileError: "",
-		revision: null
+		revision: null,
+		tableCode: "",
+		ships: [],
+		homeShip: "",
+		pulses: [],
+		packet: null,
+		overrideCode: "",
+		overrideError: ""
 	});
 
 	let pulling = false;
@@ -50,8 +54,47 @@ export function createTerminal() {
 		audio.play().catch(function () {});
 	}
 
+	function sessionId() {
+		if (!state.tableCode || !state.ship || !state.ship.id) return "";
+		return state.tableCode + ":" + state.ship.id;
+	}
+
 	function save() {
-		if (state.ship) saveSession(state.ship.id, state.session);
+		const id = sessionId();
+		if (id) saveSession(id, state.session);
+	}
+
+	function loadHere() {
+		const current = loadSession(sessionId());
+		if (current.accountId || current.overrideToken || current.seenPulses.length) return current;
+		if (state.ship && state.ship.id === state.homeShip) {
+			const legacy = loadSession(state.tableCode);
+			if (legacy.accountId || legacy.overrideToken) return legacy;
+		}
+		return current;
+	}
+
+	function pulseHere(pulse) {
+		if (!state.ship) return false;
+		if (pulse.shipId && pulse.shipId !== state.ship.id) return false;
+		return true;
+	}
+
+	function ack(moduleId) {
+		let changed = false;
+		(state.pulses || []).forEach(function (pulse) {
+			if (!pulseHere(pulse) || pulse.module !== moduleId) return;
+			if (state.session.seenPulses.indexOf(pulse.id) !== -1) return;
+			state.session.seenPulses.push(pulse.id);
+			changed = true;
+		});
+		if (changed) save();
+	}
+
+	function unseen(moduleId) {
+		return (state.pulses || []).some(function (pulse) {
+			return pulseHere(pulse) && pulse.module === moduleId && state.session.seenPulses.indexOf(pulse.id) === -1;
+		});
 	}
 
 	function setAccount(account) {
@@ -127,7 +170,7 @@ export function createTerminal() {
 			setAccount(found);
 			return;
 		}
-		if (pinHash(state.ship.salt, state.pin) !== pending.pinHash) {
+		if (pinHash(pending.pinSalt || state.ship.salt, state.pin) !== pending.pinHash) {
 			state.loginError = "Access denied";
 			state.pin = "";
 			play("accessdenied.mp3");
@@ -144,18 +187,21 @@ export function createTerminal() {
 	}
 
 	function resetStation() {
-		if (!state.ship) return;
+		if (!state.tableCode) return;
 		if (!window.confirm("Clear this station's login, unlocks, and notes?")) return;
-		resetSession(state.ship.id);
+		resetSession(sessionId());
 		state.session = emptySession();
 		state.account = null;
 		state.grants = null;
+		state.packet = null;
 		state.mode = "login";
 		state.loginError = "";
 	}
 
 	function logout() {
 		state.session.accountId = null;
+		state.session.overrideToken = null;
+		state.packet = null;
 		save();
 		state.account = null;
 		state.grants = null;
@@ -165,10 +211,12 @@ export function createTerminal() {
 	function openModule(id) {
 		play("sound1.wav");
 		state.module = id;
+		ack(id);
 	}
 
 	function home() {
 		state.module = "home";
+		ack("announcements");
 	}
 
 	function unlockEntry(entry) {
@@ -205,52 +253,131 @@ export function createTerminal() {
 	}
 
 	async function pullShared() {
-		if (!state.ship || pulling) return;
+		if (!state.tableCode || pulling) return;
 		pulling = true;
 		try {
-			const shared = await loadSharedState(state.ship.id);
-			if (!shared || shared.revision === state.revision) return;
+			const headers = {};
+			if (state.session.overrideToken) headers["X-Override-Token"] = state.session.overrideToken;
+			const shipQuery = state.ship && state.ship.id ? "?ship=" + encodeURIComponent(state.ship.id) : "";
+			const response = await fetch("api/tables/" + encodeURIComponent(state.tableCode) + "/state" + shipQuery, {
+				cache: "no-store",
+				headers: headers
+			});
+			if (!response.ok) return;
+			const shared = await response.json();
+			if (shared.shipId && state.ship && shared.shipId !== state.ship.id) return;
+			if (Array.isArray(shared.ships)) state.ships = shared.ships;
+			if (shared.homeShip) state.homeShip = shared.homeShip;
+			const same = shared.revision === state.revision;
 			state.revision = shared.revision;
-			applySharedState(state.ship, shared);
+			state.pulses = shared.pulses || [];
+			if (!same) applySharedState(state.ship, shared);
+			if (state.session.overrideToken && shared.packet) state.packet = shared.packet;
 		} finally {
 			pulling = false;
 		}
 	}
 
+	async function sendMail(to, subject, body) {
+		const response = await fetch("api/tables/" + encodeURIComponent(state.tableCode) + "/messages", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				from: state.account.id,
+				to: to,
+				subject: subject,
+				body: body,
+				shipId: state.ship.id
+			})
+		});
+		if (!response.ok) {
+			play("accessdenied.mp3");
+			return false;
+		}
+		await pullShared();
+		ack("mail");
+		play("keyok1.mp3");
+		return true;
+	}
+
+	let noteTimer = 0;
+	function saveStationNote(body) {
+		window.clearTimeout(noteTimer);
+		noteTimer = window.setTimeout(async function () {
+			if (!state.tableCode || !state.account) return;
+			await fetch("api/tables/" + encodeURIComponent(state.tableCode) + "/notes", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ accountId: state.account.id, body: body, shipId: state.ship.id })
+			});
+			await pullShared();
+			ack("notes");
+		}, 400);
+	}
+
+	async function submitOverride() {
+		state.overrideError = "";
+		const response = await fetch("api/tables/" + encodeURIComponent(state.tableCode) + "/override", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ accountId: state.account.id, code: state.overrideCode, shipId: state.ship.id })
+		});
+		if (!response.ok) {
+			state.overrideError = "Override rejected";
+			state.overrideCode = "";
+			play("accessdenied.mp3");
+			return;
+		}
+		const data = await response.json();
+		state.session.overrideToken = data.token;
+		state.packet = data.packet;
+		state.overrideCode = "";
+		save();
+		play("accessgranted.mp3");
+		openModule("packet");
+	}
+
 	async function boot() {
 		if (location.protocol === "file:") {
 			state.mode = "error";
-			state.loginError = "Open this terminal through a web server so it can load the ship file.";
+			state.loginError = "Open this terminal through a web server.";
 			return;
 		}
-		let request;
+		const params = new URLSearchParams(location.search);
+		if (params.has("gm")) {
+			state.mode = "gm";
+			document.title = "GM desk";
+			return;
+		}
+		const code = tableCode();
+		if (!code) {
+			state.mode = "standby";
+			document.title = "MU/TH/UR 2000";
+			return;
+		}
 		try {
-			request = new URL(scenarioRequest(), location.href);
-		} catch (err) {
-			state.mode = "error";
-			state.loginError = "The ship file address is not valid.";
-			return;
-		}
-		if (request.protocol !== "http:" && request.protocol !== "https:") {
-			state.mode = "error";
-			state.loginError = "The ship file must be an http or https address.";
-			return;
-		}
-		try {
-			const response = await fetch(request.href, { cache: "no-store" });
+			const requested = params.get("ship");
+			const address = "api/tables/" + encodeURIComponent(code) + (requested ? "?ship=" + encodeURIComponent(requested) : "");
+			const response = await fetch(address, { cache: "no-store" });
 			if (!response.ok) throw new Error("missing");
-			state.ship = await response.json();
-			await pullShared();
+			const data = await response.json();
+			state.tableCode = data.code;
+			state.ship = data.ship;
+			state.ships = data.ships || [];
+			state.homeShip = data.homeShip || (data.ship && data.ship.id) || "";
+			state.revision = data.revision;
+			state.pulses = data.pulses || [];
 		} catch (err) {
 			state.mode = "error";
-			state.loginError = "Ship file could not be loaded.";
+			state.loginError = "This table is not on file.";
 			return;
 		}
 		document.title = (state.ship.computer || "MU/TH/UR") + " — " + (state.ship.name || "Terminal");
-		state.session = loadSession(state.ship.id);
-		const code = new URLSearchParams(location.search).get("code");
-		if (code) {
-			const account = accountForPin(state.ship, code);
+		state.session = loadHere();
+		if (state.session.overrideToken) await pullShared();
+		const card = params.get("code");
+		if (card) {
+			const account = accountForPin(state.ship, card);
 			if (account) setAccount(account);
 			else {
 				state.loginError = "Access denied";
@@ -263,9 +390,67 @@ export function createTerminal() {
 		}
 	}
 
+	async function connectShip(shipId) {
+		if (!state.tableCode || !shipId || (state.ship && state.ship.id === shipId)) return;
+		save();
+		const response = await fetch(
+			"api/tables/" + encodeURIComponent(state.tableCode) + "?ship=" + encodeURIComponent(shipId),
+			{ cache: "no-store" }
+		);
+		if (!response.ok) return;
+		const data = await response.json();
+		state.ship = data.ship;
+		state.ships = data.ships || [];
+		state.homeShip = data.homeShip || state.homeShip;
+		state.revision = data.revision;
+		state.pulses = data.pulses || [];
+		state.packet = null;
+		state.module = "home";
+		state.pin = "";
+		state.loginError = "";
+		document.title = (state.ship.computer || "MU/TH/UR") + " — " + (state.ship.name || "Terminal");
+		const url = new URL(location.href);
+		url.searchParams.set("table", state.tableCode);
+		url.searchParams.set("ship", state.ship.id);
+		history.replaceState(null, "", url);
+		state.session = loadHere();
+		if (state.session.overrideToken) await pullShared();
+		if (state.session.accountId && accountById(state.ship, state.session.accountId)) {
+			setAccount(accountById(state.ship, state.session.accountId));
+		} else {
+			state.account = null;
+			state.grants = null;
+			state.mode = "login";
+		}
+	}
+
+	async function transferPersonal(toShipId) {
+		const other = (state.ships || []).find(function (ship) { return ship.id === toShipId; });
+		if (!other || !state.account || state.account.id === "public" || !state.ship) return;
+		const sure = window.confirm(
+			"Move your personal mail and station notes to " + other.name + "? Schematics, logs, and ship status stay on this computer."
+		);
+		if (!sure) return;
+		const response = await fetch("api/tables/" + encodeURIComponent(state.tableCode) + "/transfer", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				accountId: state.account.id,
+				fromShip: state.ship.id,
+				toShip: toShipId
+			})
+		});
+		if (!response.ok) {
+			play("accessdenied.mp3");
+			return;
+		}
+		await pullShared();
+		play("keyok1.mp3");
+	}
+
 	function start() {
 		boot();
-		timer = window.setInterval(pullShared, 15000);
+		timer = window.setInterval(pullShared, 5000);
 		window.addEventListener("keydown", onKeydown);
 	}
 
@@ -290,6 +475,12 @@ export function createTerminal() {
 		openModule,
 		home,
 		unlockEntry,
+		unseen,
+		sendMail,
+		saveStationNote,
+		submitOverride,
+		connectShip,
+		transferPersonal,
 		start,
 		stop
 	};

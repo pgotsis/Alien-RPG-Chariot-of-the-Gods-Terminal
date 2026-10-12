@@ -7,6 +7,7 @@ import MailView from "./MailView.vue";
 import MapView from "./MapView.vue";
 import MastHead from "./MastHead.vue";
 import NotesView from "./NotesView.vue";
+import PacketView from "./PacketView.vue";
 import PersonnelView from "./PersonnelView.vue";
 import ScreenBar from "./ScreenBar.vue";
 import StatusView from "./StatusView.vue";
@@ -24,6 +25,7 @@ const terminal = inject("terminal");
 	<StatusView v-else-if="terminal.state.module === 'status'" />
 	<LogsView v-else-if="terminal.state.module === 'logs'" />
 	<NotesView v-else-if="terminal.state.module === 'notes'" />
+	<PacketView v-else-if="terminal.state.module === 'packet' && terminal.state.packet" />
 	<FilesView v-else-if="terminal.state.module === 'files'" />
 	<TasksView v-else-if="terminal.state.module === 'tasks'" />
 	<template v-else>

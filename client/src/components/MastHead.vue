@@ -38,5 +38,18 @@ const accessColor = computed(function () {
 			<span>Access: {{ label }}</span>
 			<span v-if="terminal.state.account.homeShip">{{ terminal.state.account.homeShip }}</span>
 		</div>
+		<div v-if="(terminal.state.ships || []).length > 1" class="computer-row">
+			<button
+				v-for="item in terminal.state.ships"
+				:key="item.id"
+				class="term-btn"
+				:class="{ on: terminal.state.ship && item.id === terminal.state.ship.id }"
+				type="button"
+				@click="terminal.connectShip(item.id)"
+			>
+				{{ item.computer }}
+				<small>{{ item.name }}</small>
+			</button>
+		</div>
 	</div>
 </template>

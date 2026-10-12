@@ -1,13 +1,15 @@
 <script setup>
-import { computed, inject } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import { accountById, notesVisible } from "../lib/access.js";
 import LinesText from "./LinesText.vue";
 import CodeEntry from "./CodeEntry.vue";
 import ScreenBar from "./ScreenBar.vue";
 
 const terminal = inject("terminal");
+const draft = ref("");
+const focused = ref(false);
 
-const notes = computed(() => notesVisible(terminal.state.ship, terminal.state.account, terminal.state.grants));
+const notes = computed(() => notesVisible(terminal.state.ship, terminal.state.account, terminal.state.grants).filter((note) => !note.private));
 
 const open = computed(() => notes.value.find((note) => note.id === terminal.state.openNoteId) || null);
 
@@ -15,16 +17,19 @@ const locked = computed(() => (
 	open.value && open.value.codeHash && terminal.state.session.unlocked.indexOf(open.value.id) === -1
 ));
 
-const scratch = computed({
-	get() {
-		const id = terminal.state.account.id;
-		return terminal.state.session.scratch[id] || "";
-	},
-	set(value) {
-		terminal.state.session.scratch[terminal.state.account.id] = value;
-		terminal.save();
-	}
+const stationBody = computed(function () {
+	const id = "station-" + terminal.state.account.id;
+	const note = (terminal.state.ship.notes || []).find((item) => item.id === id);
+	return note ? note.body || "" : "";
 });
+
+watch(stationBody, function (value) {
+	if (!focused.value) draft.value = value;
+}, { immediate: true });
+
+function onDraft() {
+	terminal.saveStationNote(draft.value);
+}
 
 function ownerName(note) {
 	const owner = accountById(terminal.state.ship, note.owner);
@@ -63,6 +68,6 @@ function ownerName(note) {
 		</div>
 	</div>
 	<h2>Station notes</h2>
-	<p class="hint">Typed here. Kept on this terminal only.</p>
-	<textarea v-model="scratch" class="scratch"></textarea>
+	<p class="hint">Kept with this person on this table.</p>
+	<textarea v-model="draft" class="scratch" @focus="focused = true" @blur="focused = false" @input="onDraft"></textarea>
 </template>

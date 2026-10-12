@@ -1,3 +1,5 @@
+import { pinHash } from "./sha256.js";
+
 const CLEARANCE_ORDER = ["public", "crew", "research", "security", "command", "company"];
 
 function expandClearance(ship, tags) {
@@ -134,6 +136,7 @@ function messagesFor(ship, archiveId, folder, viewer, grants) {
 function notesVisible(ship, account, grants) {
 	const tokens = grants.notes || [];
 	return (ship.notes || []).filter(function (note) {
+		if (note.private) return note.owner === account.id;
 		if (tokens.indexOf("self") !== -1 && note.owner === account.id) return true;
 		if (tokens.indexOf("account:" + note.owner) !== -1) return true;
 		const owner = accountById(ship, note.owner);
@@ -150,8 +153,8 @@ function entryVisible(entry, viewClearance) {
 }
 
 function accountForPin(ship, pin) {
-	const hashed = pinHash(ship.salt, pin);
 	return (ship.accounts || []).find(function (account) {
+		const hashed = pinHash(account.pinSalt || ship.salt, pin);
 		if (account.pinHash && account.pinHash === hashed) return true;
 		return (account.pinHashes || []).indexOf(hashed) !== -1;
 	}) || null;

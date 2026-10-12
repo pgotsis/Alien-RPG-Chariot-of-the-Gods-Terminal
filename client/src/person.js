@@ -3,6 +3,8 @@ import { accountById } from "./lib/access.js";
 export function personName(ship, id) {
 	if (!id) return "";
 	if (ship.directories && ship.directories[id]) return ship.directories[id];
+	const contact = (ship.contacts || []).find(function (item) { return item.id === id; });
+	if (contact) return contact.name;
 	const account = accountById(ship, id);
 	return account ? account.shortName || account.name : id;
 }

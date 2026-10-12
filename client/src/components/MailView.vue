@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, watchEffect } from "vue";
+import { computed, inject, ref, watchEffect } from "vue";
 import { accountById, mailArchives, messagesFor } from "../lib/access.js";
 import { personName } from "../person.js";
 import LinesText from "./LinesText.vue";
@@ -7,8 +7,24 @@ import ScreenBar from "./ScreenBar.vue";
 
 const terminal = inject("terminal");
 const folders = ["inbox", "outbox", "drafts"];
+const to = ref("");
+const subject = ref("");
+const body = ref("");
 
 const archives = computed(() => mailArchives(terminal.state.ship, terminal.state.account, terminal.state.grants));
+
+const recipients = computed(function () {
+	const account = terminal.state.account;
+	const crew = (terminal.state.ship.accounts || []).filter(function (item) {
+		return item.listed && !item.external && item.id !== account.id && item.id !== "public";
+	});
+	const contacts = terminal.state.ship.contacts || [];
+	return contacts.map(function (contact) {
+		return { id: contact.id, label: contact.name };
+	}).concat(crew.map(function (item) {
+		return { id: item.id, label: item.name };
+	}));
+});
 
 watchEffect(function () {
 	const ids = archives.value;
@@ -38,7 +54,19 @@ function who(message) {
 
 function label(id) {
 	const other = accountById(terminal.state.ship, id);
-	return other ? other.shortName || other.name : id;
+	if (other) return other.shortName || other.name;
+	const contact = (terminal.state.ship.contacts || []).find((item) => item.id === id);
+	return contact ? contact.name : id;
+}
+
+async function send() {
+	if (!to.value || !subject.value.trim() || !body.value.trim()) return;
+	const ok = await terminal.sendMail(to.value, subject.value.trim(), body.value.trim());
+	if (!ok) return;
+	to.value = "";
+	subject.value = "";
+	body.value = "";
+	terminal.state.folder = "outbox";
 }
 </script>
 
@@ -91,4 +119,14 @@ function label(id) {
 			</template>
 		</div>
 	</div>
+	<form v-if="terminal.state.archiveId === terminal.state.account.id" class="panel compose" @submit.prevent="send">
+		<h2>New message</h2>
+		<select v-model="to">
+			<option value="">Recipient</option>
+			<option v-for="person in recipients" :key="person.id" :value="person.id">{{ person.label }}</option>
+		</select>
+		<input v-model="subject" type="text" maxlength="200" placeholder="Subject" />
+		<textarea v-model="body" class="scratch"></textarea>
+		<button class="term-btn" type="submit">Send</button>
+	</form>
 </template>

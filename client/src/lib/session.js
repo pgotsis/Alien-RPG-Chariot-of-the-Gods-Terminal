@@ -1,7 +1,7 @@
 // This browser only: who is logged in here, which coded files this station has opened,
 // and notes typed at this station. Ship status is not stored here.
 function emptySession() {
-	return { accountId: null, unlocked: [], scratch: {} };
+	return { accountId: null, unlocked: [], scratch: {}, seenPulses: [], overrideToken: null };
 }
 
 function sessionKey(shipId) {
@@ -16,7 +16,9 @@ function loadSession(shipId) {
 		return {
 			accountId: parsed.accountId || null,
 			unlocked: Array.isArray(parsed.unlocked) ? parsed.unlocked : [],
-			scratch: parsed.scratch && typeof parsed.scratch === "object" ? parsed.scratch : {}
+			scratch: parsed.scratch && typeof parsed.scratch === "object" ? parsed.scratch : {},
+			seenPulses: Array.isArray(parsed.seenPulses) ? parsed.seenPulses : [],
+			overrideToken: parsed.overrideToken || null
 		};
 	} catch (err) {
 		return emptySession();
