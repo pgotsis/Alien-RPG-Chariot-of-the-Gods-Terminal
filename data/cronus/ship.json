@@ -1,0 +1,795 @@
+{
+  "id": "cronus",
+  "name": "USCSS Cronus",
+  "computer": "MU/TH/UR 2000",
+  "salt": "uscss-cronus-muthr-v1",
+  "date": "04.20.2112",
+  "schematicOrder": ["public", "crew", "research", "security", "command", "company"],
+  "clearanceInherits": {
+    "public": [],
+    "crew": ["public"],
+    "security": ["crew"],
+    "research": ["crew"],
+    "command": ["security", "research"],
+    "company": ["command"]
+  },
+  "clearanceGrants": {
+    "public": {
+      "modules": ["map", "personnel", "status"],
+      "mail": [],
+      "notes": [],
+      "schematic": "public",
+      "rosterDetail": false
+    },
+    "crew": {
+      "modules": ["mail", "map", "personnel", "status", "logs", "notes", "files"],
+      "mail": ["self", "broadcast"],
+      "notes": ["self"],
+      "schematic": "crew",
+      "rosterDetail": false
+    },
+    "security": {
+      "modules": ["mail", "map", "personnel", "status", "logs", "notes", "files"],
+      "mail": ["self", "broadcast", "clearance:security"],
+      "notes": ["self", "clearance:security"],
+      "schematic": "security",
+      "rosterDetail": true
+    },
+    "research": {
+      "modules": ["mail", "map", "personnel", "status", "logs", "notes", "files"],
+      "mail": ["self", "broadcast", "clearance:research"],
+      "notes": ["self", "clearance:research"],
+      "schematic": "research",
+      "rosterDetail": false
+    },
+    "command": {
+      "modules": ["mail", "map", "personnel", "status", "logs", "notes", "files"],
+      "mail": ["self", "broadcast", "clearance:command", "clearance:security", "clearance:research", "clearance:crew"],
+      "notes": ["self", "clearance:command", "clearance:security", "clearance:research", "clearance:crew"],
+      "schematic": "command",
+      "rosterDetail": true
+    },
+    "company": {
+      "modules": ["mail", "map", "personnel", "status", "logs", "notes", "files"],
+      "mail": ["self", "broadcast", "clearance:company", "clearance:command", "clearance:research"],
+      "notes": ["self", "clearance:company", "clearance:command", "clearance:research"],
+      "schematic": "company",
+      "rosterDetail": true
+    }
+  },
+  "modules": [
+    { "id": "mail", "label": "Mail" },
+    { "id": "notes", "label": "Notes" },
+    { "id": "files", "label": "Files" },
+    { "id": "map", "label": "Schematic" },
+    { "id": "personnel", "label": "Personnel" },
+    { "id": "status", "label": "Ship status" },
+    { "id": "logs", "label": "Logs" }
+  ],
+  "tasks": [],
+  "contacts": [
+    { "id": "wy-corporate", "name": "Weyland-Yutani Dispatch" }
+  ],
+  "directories": {
+    "crew": "Cronus crew",
+    "wy-corporate": "Weyland-Yutani Corporate"
+  },
+  "overview": {
+    "public": "images/USCSSCronusPlayerMap.png",
+    "crew": "images/USCSSCronusPlayerMap.png",
+    "research": "images/USCSSCronusPlayerMap.png",
+    "security": "images/USCSSCronusPlayerMap.png",
+    "command": "images/USCSSCronusPlayerMap.png",
+    "company": "images/USCSSCronusGMMap.png"
+  },
+  "accounts": [
+    {
+      "id": "s-andrews",
+      "name": "Sharon Andrews",
+      "shortName": "S.Andrews",
+      "job": "Chef",
+      "clearance": ["crew"],
+      "status": "Deceased",
+      "lastLogin": "03.19.2112",
+      "listed": true,
+      "photo": "images/generic/f32.jpg"
+    },
+    {
+      "id": "ava",
+      "name": "Ava 6",
+      "shortName": "Ava 6",
+      "job": "Synthetic",
+      "clearance": ["crew"],
+      "status": "Deactivated",
+      "lastLogin": "04.20.2112",
+      "listed": true,
+      "photo": "",
+      "pinHash": "e9562d5dbffedc8ff82125afcfa8e70e98cfd14dc0a22ee94d17aca69609b7ec"
+    },
+    {
+      "id": "s-boyd",
+      "name": "Steven Boyd",
+      "shortName": "S.Boyd",
+      "job": "Security Officer",
+      "clearance": ["security"],
+      "status": "Unaccounted",
+      "lastLogin": "03.02.2112",
+      "listed": true,
+      "photo": "images/generic/f25.jpg"
+    },
+    {
+      "id": "m-carter",
+      "name": "Marcus Carter",
+      "shortName": "M.Carter",
+      "job": "Security Officer",
+      "clearance": ["security"],
+      "status": "Deceased",
+      "lastLogin": "03.14.2112",
+      "listed": true,
+      "photo": "images/generic/f21.jpg"
+    },
+    {
+      "id": "l-clayton",
+      "name": "Lori Clayton",
+      "shortName": "L.Clayton",
+      "job": "Company Liaison",
+      "clearance": ["company"],
+      "status": "Cryo",
+      "lastLogin": "03.21.2112",
+      "listed": true,
+      "photo": "",
+      "pinHash": "2a445f0e703d6644c3dca655a277099b8f8f5801db52612cb3b0e0b945cc4a91"
+    },
+    {
+      "id": "d-cooper",
+      "name": "Daniel Cooper",
+      "shortName": "D.Cooper",
+      "job": "Chief Scientist",
+      "clearance": ["research"],
+      "status": "Cryo",
+      "lastLogin": "03.21.2112",
+      "listed": true,
+      "photo": "",
+      "pinHash": "da836308f70069f687ee599c595d4edbae36da98eac4e0e7b2e8fb97b1c66250"
+    },
+    {
+      "id": "l-flynn",
+      "name": "Liam Flynn",
+      "shortName": "L.Flynn",
+      "job": "Ship Medic",
+      "clearance": ["research"],
+      "status": "Cryo",
+      "lastLogin": "03.20.2112",
+      "listed": true,
+      "photo": "",
+      "pinHash": "fc64dbee2de33b9f7ab81515ab1deb170854ff7722912f489c6e87d594696dd0"
+    },
+    {
+      "id": "a-garcia",
+      "name": "Alejandro Garcia",
+      "shortName": "A.Garcia",
+      "job": "Security Officer",
+      "clearance": ["security"],
+      "status": "Deceased",
+      "lastLogin": "03.16.2112",
+      "listed": true,
+      "photo": "images/generic/f10.jpg"
+    },
+    {
+      "id": "a-johns",
+      "name": "Albert Johns",
+      "shortName": "A.Johns",
+      "job": "Second Officer",
+      "clearance": ["command"],
+      "status": "Cryo",
+      "lastLogin": "03.21.2112",
+      "listed": true,
+      "photo": "",
+      "pinHash": "93d9d58ab67f08b96b3e2a7c33bda8c4b2bf17f1520e4db2657a4e017ef99ae9"
+    },
+    {
+      "id": "r-lynch",
+      "name": "Ryan Lynch",
+      "shortName": "R.Lynch",
+      "job": "Mechanic",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "lastLogin": "03.20.2112",
+      "listed": true,
+      "photo": "images/generic/f09.jpg"
+    },
+    {
+      "id": "w-marshall",
+      "name": "Wayne Marshall",
+      "shortName": "W.Marshall",
+      "job": "Pilot",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "lastLogin": "03.17.2112",
+      "listed": true,
+      "photo": "images/generic/f12.jpg"
+    },
+    {
+      "id": "a-moreno",
+      "name": "Alice Moreno",
+      "shortName": "A.Moreno",
+      "job": "Chief Navigator",
+      "clearance": ["crew"],
+      "status": "Deceased",
+      "lastLogin": "03.17.2112",
+      "listed": true,
+      "photo": "images/generic/f15.jpg"
+    },
+    {
+      "id": "t-nguyen",
+      "name": "Thomas Nguyen",
+      "shortName": "T.Nguyen",
+      "job": "Science Officer",
+      "clearance": ["research"],
+      "status": "Deceased",
+      "lastLogin": "03.16.2112",
+      "listed": true,
+      "photo": "images/generic/f29.jpg"
+    },
+    {
+      "id": "v-reid",
+      "name": "Valerie Reid",
+      "shortName": "V.Reid",
+      "job": "Security Officer",
+      "clearance": ["security"],
+      "status": "Cryo",
+      "lastLogin": "03.20.2112",
+      "listed": true,
+      "photo": "",
+      "pinHash": "8675d2ff8bf81ce99e497798f6171820dc3a2aabc3ad2e4ae1084435bb5dd0f4"
+    },
+    {
+      "id": "c-reynolds",
+      "name": "Clark Reynolds",
+      "shortName": "C.Reynolds",
+      "job": "Security Officer",
+      "clearance": ["security"],
+      "status": "Unaccounted",
+      "lastLogin": "03.21.2112",
+      "listed": true,
+      "photo": "images/generic/f30.jpg",
+      "pinHash": "09f65925fe4f11aaed3791dd7d0557d9bcc74788261373c29677ff74006503a0"
+    },
+    {
+      "id": "e-tenwick",
+      "name": "Emily Tenwick",
+      "shortName": "E.Tenwick",
+      "job": "Science Officer",
+      "clearance": ["research"],
+      "status": "Deceased",
+      "lastLogin": "03.19.2112",
+      "listed": true,
+      "photo": "images/generic/f28.jpg",
+      "pinHash": "d9cd4dc6190c5949f11a4edc7fc7548d85b74c042baec23d20afd10f58d5f592"
+    },
+    {
+      "id": "r-walker",
+      "name": "Richard Walker",
+      "shortName": "R.Walker",
+      "job": "Captain",
+      "clearance": ["command"],
+      "status": "Deceased",
+      "lastLogin": "03.20.2112",
+      "listed": true,
+      "photo": "images/generic/f08.jpg",
+      "pinHash": "113758552f2a6247f724b809babb6b0edf2aa206064fbca3a90f57cc4c7f6b8a"
+    },
+    {
+      "id": "j-walthorp",
+      "name": "Justin Walthorp",
+      "shortName": "J.Walthorp",
+      "job": "Chief Engineer",
+      "clearance": ["crew"],
+      "status": "Unaccounted",
+      "lastLogin": "03.18.2112",
+      "listed": true,
+      "photo": "images/generic/f11.jpg"
+    },
+    {
+      "id": "s-park",
+      "name": "S. Park",
+      "shortName": "S.Park",
+      "job": "Company Auditor",
+      "clearance": ["company"],
+      "listed": false,
+      "external": true,
+      "homeShip": "USCSS Montero",
+      "photo": "",
+      "pinHash": "8e6651210a83c1d077f12bdb27cb062d7506a1656be502dc1071d2d4e35b19d0",
+      "overrideHash": "60905a19c3f718949661690fbf313f0011d2b413afeb6b75a124db1b5d659c44",
+      "packetShip": "montero",
+      "restrictTo": {
+        "modules": ["map", "personnel", "status", "logs"],
+        "mail": [],
+        "notes": [],
+        "schematic": "public",
+        "rosterDetail": false,
+        "seeClearance": ["public", "crew"]
+      }
+    }
+  ],
+  "mail": [
+    {
+      "id": "lv-1113",
+      "subject": "LV-1113 Reached",
+      "to": "wy-corporate",
+      "from": "l-clayton",
+      "time": "3-5-2112 5:55 am",
+      "body": "The crew has woken up from hypersleep as the Cronus approaches the 26 Draconis system. Preliminary scans of LV-1113 reveal it to be a lush, jungle planet with plenty of lifeforms. The research team is preparing to deploy the science module. Walker has asked the security team to accompany them. The chemical agent may be down there, but there's no telling what else is on the planet."
+    },
+    {
+      "id": "origin",
+      "subject": "Origin of AO-3959X.91-15",
+      "to": "l-clayton",
+      "from": "d-cooper",
+      "time": "3-16-2112 7:55 am",
+      "body": "Just as the deciphered transmission led us to believe, we have found AO-3949X.91-15 here on LV-1113. The science team has begun experimenting on the black liquid, dubbing it the \"26 Draconis strain.\"\n\nWhat is most interesting is that the chemical did not originate here, rather it was deployed here a long time ago. It has even mutated the planet's lifeforms. Genetic testing on the egg sacs growing in the temple show that they were grown primarily from the 26 Draconis Strain.\n\nI'm uploading our analysis to the access terminal."
+    },
+    {
+      "id": "xenomorph-attack",
+      "subject": "Xenomorph Attack",
+      "to": "r-walker",
+      "from": "c-reynolds",
+      "time": "3-17-2112 6:06 am",
+      "body": "It is my duty to report that Carter is dead. It happened so fast I can hardly describe it. At first he complained of migraines. Then, blood started pouring out of him. Then, Wright tried to administer aid, some kind of creature burst out of his body. It cut up Wright pretty bad before I jerked it off of him. It ran off into the jungle.\n\nCooper was able to find traces of spores that had infected Carter, entering his body and mutating his insides to grow that thing. They came from the egg sacs we found. Who knows who else is infected.\n\nWhere in Middle Heavens are we?"
+    },
+    {
+      "id": "evacuation",
+      "subject": "Urging Evacuation of LV-1113",
+      "to": "r-walker",
+      "from": "v-reid",
+      "time": "3-17-2112 3:11 pm",
+      "body": "We've lost Carter, Wright, Garcia and Nguyen.\n\n9 hours later, the creature that came out of Carter came back for the rest of us. Now it was much bigger. This time it tore Wright to shreds and was on Garcia before he could draw his rifle. In a panic, we started open firing. The creature finally went down, but Nguyen was hit in the crossfire.\n\nDamn the company, we cannot stay on this rock another minute. I am strongly urging you to recall the science team immediately and get every survivor off world and back on the Cronus. If Clayton gives you a hard time, tell her she can stay down here."
+    },
+    {
+      "id": "egg-sacs",
+      "subject": "Alert! EGG SACS on the SHIP",
+      "to": "r-walker",
+      "from": "e-tenwick",
+      "time": "3-19-2112 11:27 am",
+      "body": "I don't know how this could have happened but the same egg sacs we found on LV-1113 are now growing on the Cronus. I wasn't sure at first, but I saw a clutch of bird-sized eggs growing in the air scrubbers. I may have already disturbed them and released the spores.\n\nI thought we confirmed the Neomorphs don't lay eggs? So how did this happen? We'll all be incubators for those demons soon."
+    },
+    {
+      "id": "infected",
+      "subject": "I've been Infected",
+      "to": "l-flynn",
+      "from": "e-tenwick",
+      "time": "3-19-2112 4:18 pm",
+      "body": "I just confirmed it with a blood test. I've been infected. There isn't much time before a monster crawls out of me. I saw what happened to the others on LV-1113. No thanks.\n\nI donate what's left of me to science. Kill me. Take it out of me. Study it. Learn from it. That's all I have left to give.\n\nI still don't know how the egg sacs got on the ship. But it's only a matter of time before everyone is infected. The motes are smaller than grains of sand. They travel to the nearest potential host and zero-in on any unprotected orifice.\n\nMaybe Flynn can whip up some kind of protection from it. Do whatever it takes. And do it fast, my head is killing me."
+    },
+    {
+      "id": "cure",
+      "subject": "Update on Possible \"Cure\"",
+      "to": "r-walker",
+      "from": "l-flynn",
+      "time": "3-20-2112 3:55 pm",
+      "body": "I have made immense progress on a possible \"cure\" for those infected by the neomorph spores that have somehow found their way onto the Cronus. I've tested it on my own infection and it quickly rendered the mutated cells in my body into a benign tumor. I think we should begin distributing the inoculation immediately. There is no time for further study.\n\nThis progress was made possible only by recovering the embryonic \"bloodburster\" we retrieved from Tenwick. So we can take solace that she did not perish entirely in vain.\n\nFurthermore, the inoculation may have further medicinal benefits beyond the scope of the spores, such as stopping some forms of cancer. Despite the tragedies we endured here, perhaps there is a silver lining in all this."
+    },
+    {
+      "id": "side-effects",
+      "subject": "Side Effects?",
+      "to": "l-flynn",
+      "from": "r-walker",
+      "time": "3-20-2112 6:19 pm",
+      "body": "I know you're busy but I've got some health issues I can't ignore. My skin is mottling and blotchy and I'm starting to feel sick. If there was a monster growing in me, it would have killed me by now, so it must be something else.\n\nYou didn't mention any side effects with the inoculation, but could that be it? Everyone else seems fine.\n\nI'm going to try to get over to medical, if the coast is clear."
+    },
+    {
+      "id": "walker-draft",
+      "subject": "(Draft) Youkkkkk iSELF",
+      "to": "",
+      "from": "r-walker",
+      "time": "3-20-2112 1:47 am",
+      "body": "FEEL ITCHY AND...AGGGG ..I SEE THE RED RIGHT?\n\n...IT HURTS...WHO ARE YOU? WAHT AM i NOW?"
+    },
+    {
+      "id": "in-command",
+      "subject": "You're in Command Now",
+      "to": "a-johns",
+      "from": "v-reid",
+      "time": "3-21-2112 9:10 am",
+      "body": "The Captain is dead. I killed him. You can court martial me when we get back to Earth if you want. You can tear up my contract with WY for all I care.\n\nIt had to be done. He wasn't himself anymore, he was a monster. A threat to us all. Unlike you, I've seen too much death. First on Torin Prime and now LV-1113. Sometimes you have to make the hard decisions.\n\nAnd now that you're the new acting captain, you'll be making a lot of hard decisions. Between monsters bursting out of people and others turning into monsters themselves, there'll be no shortage of sacrifices to be made to save what's left of us.\n\nGood luck to you. You can depend on me to do whatever it takes to protect the Cronus. Unless you want to throw me in the brig for mutiny."
+    },
+    {
+      "id": "the-truth",
+      "subject": "Tell Me The Truth",
+      "to": "l-flynn",
+      "from": "d-cooper",
+      "time": "3-21-2112 10:31 am",
+      "body": "I just finished the initial dissection on that thing that was once Captain Walker. I took a sampling of his DNA and found something that we should really discuss.\n\nFlynn, I know things have gone to hell, but I need you to be honest with me. Why didn't you tell us that the \"cure\" was a derivative of the 26 Draconis strain?\n\nWe've known each other a long time and I know you would do anything to save a life. But did you ever consider that the \"cure\" itself was responsible for the captain's mutation? There is still so much we don't know about AO-3959.91-15."
+    },
+    {
+      "id": "lockdown",
+      "subject": "ALL REMAINING PERSONNEL REPORT TO CRYOCHAMBERS IMMEDIATELY",
+      "to": "crew",
+      "from": "a-johns",
+      "time": "3-21-2112 2:08 pm",
+      "body": "We have lost control of the Cronus. Every remaining crewman is ordered to report to the cryochambers immediately for the voyage back to Earth. I have set the bridge to initiate total lockdown in 20 minutes.\n\nOnce those doors are locked, we will be safe. But only if you're inside them. The creatures will not be able to open the doors. Only someone with card access can open them.\n\nAva will continue to maintain the ship. The xenomorphs seem to ignore her. With any hope, we might actually make it.\n\nI did not make this decision lightly. But as your acting captain, this was my decision. I expect you to comply."
+    },
+    {
+      "id": "not-going",
+      "subject": "Not Going To Make It",
+      "to": "a-johns",
+      "from": "c-reynolds",
+      "time": "3-21-2112 2:20 pm",
+      "body": "Well Johns, I almost made it to the cryochambers, as you ordered. But I'm afraid to tell you that I won't be making it.\n\nMy skin is mottling and blotchy, my vision is blurring and I feel like I just drank every last bottle of Walker's stash of whiskey. I know what's happening to me. Same thing that happened to Walker himself. Soon I'll become a danger to the crew.\n\nToo bad. I was so close to getting back to my wife and kids.\n\nRather than become an abomination, I've decided to end things here on my terms. Take care.\n\nThis is Second Security Officer, Clark Reynolds, signing off."
+    },
+    {
+      "id": "lifecycle",
+      "subject": "Neomorph Lifecycle Discovery",
+      "to": "a-johns",
+      "from": "ava",
+      "time": "3-28-2112 10:00 am",
+      "body": "During my routine maintenance rounds, I encountered something quite fascinating. The dead carcass of an adult neomorph creature is lying in the crew quarters. It seems to have fallen from a vent in the ceiling.\n\nWhat's interesting is that it seems to have died of natural causes. This is only 24 hours after it emerged from the spine of Officer Peters. To be born, to grow, to kill, and to die - all in a single day. Intriguing.\n\nI ran several motion sensor scans across the entire ship and no movement has been picked up. I am satisfied that there are no other xenomorphs on the ship. They must have all died of natural causes.\n\nI believe it is safe to wake you and the remaining crew from cryosleep. But as long as I am able to maintain the ship myself, I will not disturb your slumber until we reach Earth."
+    },
+    {
+      "id": "meteor",
+      "subject": "Impact of Micro-Meteor Storm",
+      "to": "a-johns",
+      "from": "ava",
+      "time": "4-17-2112 2:08 pm",
+      "body": "Unfortunately, I have some bad news to report regarding our voyage back to Earth. We encountered a micro-meteor storm that damaged the comms array and caused navigation control to fail. Lightspeed has been disengaged and we are now barreling along at sublight speed.\n\nI attempted to repair the comms array myself on the exterior of the ship when I encountered an \"abomination.\" Apparently, the ship is not free from danger as I previously reported. The mutated crew members are still very much alive, they only entered a state of hibernation (I continue to maintain the belief that the neomorphs all still perished of natural causes within 24 hours) where they went undetected from my motion scans.\n\nI ejected the \"abomination\", which I believe to be our Chief Engineer Justin Walthorp, through the airlock. But not before it smashed the side of my head with a wrench in a fit of rage.\n\nI may have suffered damage and I need to conduct a scan of my systems."
+    },
+    {
+      "id": "ava-draft",
+      "subject": "(Draft) Beeeeeep",
+      "to": "",
+      "from": "ava",
+      "time": "4-19-2112 11:55 pm",
+      "body": "Metal bones. Milk blood. Do you hear them at the window?\n\nCronus tells me. It tells me things.\n\nIt's not safe here. But my animals will protect you Johns. They are metal too.\n\nI cannot see the stars."
+    },
+    {
+      "id": "reactivation-mail",
+      "subject": "Android Reactivation",
+      "to": "crew",
+      "from": "ava",
+      "time": "4-20-2112 3:00 am",
+      "body": "This is an automated entry from Walter-model android 215437.73, designated \"Ava\". This unit has begun to malfunction. For the safety of any present human life, it will be self-deactivated.\n\nIf you wish to reactivate this unit, enter reactivation sequence B833J99.\n\nWeyland-Yutani"
+    }
+  ],
+  "notes": [
+    {
+      "id": "tenwick-blood",
+      "owner": "e-tenwick",
+      "title": "Blood test",
+      "time": "3-19-2112",
+      "body": "Confirmed. The motes are smaller than grains of sand. They zero in on any unprotected orifice. There isn't much time."
+    },
+    {
+      "id": "flynn-inoculation",
+      "owner": "l-flynn",
+      "title": "Inoculation trial",
+      "time": "3-20-2112",
+      "body": "Tested on my own infection. Mutated cells reduced to a benign tumor. No time for a second study. Begin distribution."
+    },
+    {
+      "id": "ava-sweeps",
+      "owner": "ava",
+      "title": "Motion sweeps",
+      "time": "3-28-2112",
+      "body": "Shipwide motion sweeps show no movement. Adult carcass in the crew quarters, fallen from a vent. I will not wake the crew while I can maintain the ship."
+    }
+  ],
+  "files": [
+    {
+      "id": "strain-analysis",
+      "title": "AO-3959X.91-15 preliminary analysis",
+      "time": "3-16-2112",
+      "clearance": ["research"],
+      "body": "Uploaded from the science team. The chemical did not originate on LV-1113. It was deployed here long ago and has mutated the planet's lifeforms. Genetic testing on the egg sacs in the temple shows they were grown primarily from the 26 Draconis strain."
+    },
+    {
+      "id": "ava-reactivation",
+      "title": "Android reactivation",
+      "time": "4-20-2112",
+      "clearance": ["crew"],
+      "codeHash": "40702541117109ce53aeff10ca672e446f7663943b56ab7e87442f39529ec1f0",
+      "body": "Reactivation sequence accepted. Walter-model android 215437.73, designated Ava. Confirm the unit's diagnostics before returning it to duty."
+    }
+  ],
+  "announcements": [
+    {
+      "id": "lockdown-order",
+      "title": "Report to cryochambers",
+      "from": "a-johns",
+      "time": "3-21-2112 2:08 pm",
+      "clearance": ["crew"],
+      "body": "All remaining personnel report to the cryochambers. Bridge lockdown begins in 20 minutes. Only a card can open the doors once they seal."
+    }
+  ],
+  "logs": [
+    { "id": "log-approach", "time": "3-5-2112 5:55", "clearance": ["crew"], "text": "Crew revived. Cronus on approach to the 26 Draconis system." },
+    { "id": "log-planetfall", "time": "3-5-2112 5:55", "clearance": ["company"], "text": "Corporate liaison reported planetfall at LV-1113. Science module preparing to deploy." },
+    { "id": "log-strain", "time": "3-16-2112 7:55", "clearance": ["research"], "text": "26 Draconis strain samples recovered. Preliminary analysis uploaded to the terminal." },
+    { "id": "log-attack", "time": "3-17-2112 6:06", "clearance": ["security"], "text": "Security report: casualty on LV-1113. Organism at large." },
+    { "id": "log-eggs", "time": "3-19-2112 11:27", "clearance": ["security"], "text": "Egg sacs reported growing in the air scrubbers." },
+    { "id": "log-infection", "time": "3-19-2112 16:18", "clearance": ["research"], "text": "Science officer reported a confirmed infection." },
+    { "id": "log-cure", "time": "3-20-2112 15:55", "clearance": ["research"], "text": "Medic reported an inoculation and requested immediate distribution." },
+    { "id": "log-reynolds", "time": "3-21-2112 14:20", "clearance": ["security"], "text": "Officer Reynolds reported he would not reach the cryochambers." },
+    { "id": "log-lockdown", "time": "3-21-2112 14:08", "clearance": ["crew"], "text": "Acting captain ordered all remaining personnel to cryochambers. Lockdown set." },
+    { "id": "log-lifecycle", "time": "3-28-2112 10:00", "clearance": ["research"], "text": "Synthetic reported an adult organism dead in the crew quarters. Motion sweeps clear." },
+    { "id": "log-meteor", "time": "4-17-2112 14:08", "clearance": ["crew"], "text": "Comms array damaged by a micro-meteor storm. Displacement drive disengaged." },
+    { "id": "log-ava", "time": "4-20-2112 3:00", "clearance": ["crew"], "text": "Synthetic Ava reported self-deactivation." }
+  ],
+  "systems": [
+    {
+      "id": "airlock",
+      "name": "Main airlock",
+      "state": "Open",
+      "clearance": "public",
+      "level": "NOTICE",
+      "detail": { "crew": "Umbilical detected. Deck access A-C." }
+    },
+    {
+      "id": "scrubbers",
+      "name": "Air scrubbers",
+      "state": "20% efficiency",
+      "clearance": "public",
+      "level": "WARNING",
+      "detail": {
+        "crew": "Operating at 20% efficiency due to accumulated pollutants.",
+        "security": "Cleaning required before the displacement drive can be engaged. Reachable through the ventilation shafts. Electrolysis is enabled. Risk of electrocution."
+      }
+    },
+    {
+      "id": "ftl",
+      "name": "Displacement drive",
+      "state": "Offline",
+      "clearance": "crew",
+      "level": "CRITICAL",
+      "detail": {
+        "crew": "Unable to engage.",
+        "security": "Relay disconnected from four fission engines. Radiation leak detected at reactor relay control."
+      }
+    },
+    {
+      "id": "comms",
+      "name": "Communications",
+      "state": "Damaged",
+      "clearance": "public",
+      "level": "WARNING",
+      "detail": {
+        "crew": "Comms array damaged.",
+        "command": "Micro-meteor storm damaged the comms array and navigation. Lightspeed is disengaged. The ship is at sublight."
+      }
+    },
+    {
+      "id": "cryo",
+      "name": "Cryochambers",
+      "state": "Secured",
+      "clearance": "crew",
+      "level": "NOTICE",
+      "detail": {
+        "crew": "Chambers sealed under the lockdown order.",
+        "research": "Five life signs detected. 2 deceased. 4 chambers empty."
+      }
+    },
+    {
+      "id": "reactor",
+      "name": "Reactor relay",
+      "state": "Fault",
+      "clearance": "security",
+      "level": "CRITICAL",
+      "detail": {
+        "security": "Power from the four engine pods channels through this relay. Forbidden area: emergency self destruct is accessible here."
+      }
+    },
+    {
+      "id": "science-module",
+      "name": "Science module",
+      "state": "Ejected",
+      "clearance": "public",
+      "level": "WARNING",
+      "detail": { "crew": "Science module ejected from the ship." }
+    }
+  ],
+  "rooms": {
+    "mother": {
+      "name": "MU/TH/UR 2000",
+      "requires": ["command", "company"],
+      "text": { "command": "Core interface. Command or company access." }
+    },
+    "junctiona1": {
+      "name": "Junction A1",
+      "text": { "crew": "Main airlock open. Umbilical detected. Deck access A-C." }
+    },
+    "stairwell": { "name": "Stairwell", "text": { "crew": "Allows access to all decks." } },
+    "airscrubbers": {
+      "name": "Air Scrubbers",
+      "text": {
+        "crew": "Air scrubbers operating at 20% efficiency due to accumulated pollutants.",
+        "security": "Cleaning required before the displacement drive can be engaged. Only accessible via ventilation and maintenance shafts. Carbon filters clean the air while electrolysis generates oxygen. WARNING: Electrolysis enabled. Risk of electrocution."
+      }
+    },
+    "cryochambers": {
+      "name": "Cryochambers 1-3",
+      "text": { "research": "Five life signs detected. 2 deceased. 4 chambers empty." }
+    },
+    "examinationroom": {
+      "name": "Examination Room",
+      "text": { "research": "Inventory: 2 personal medkits." }
+    },
+    "junctiona2": { "name": "Junction A2", "text": { "crew": "Shaft leads to other levels of the ship." } },
+    "leftshowers": { "name": "Port Showers", "text": { "research": "Warning: fungal organisms detected." } },
+    "rightshowers": { "name": "Starboard Showers", "text": { "crew": "" } },
+    "leftelevator": { "name": "Port Elevator", "text": { "crew": "Accesses all decks of the ship." } },
+    "rightelevator": { "name": "Starboard Elevator", "text": { "security": "Elevator damaged and inoperable." } },
+    "evastorage": { "name": "EVA Storage", "text": { "crew": "Inventory: 3 EVA suits." } },
+    "bridge": {
+      "name": "Bridge",
+      "text": { "crew": "Command station operational. Activates the displacement drive. Flight and crew records. Holographic display table. Sensor station for shipboard surveillance. Life support monitors." }
+    },
+    "escapepods": { "name": "4 Escape Pods", "text": { "company": "0/4 remaining escape pods." } },
+    "vestibule1": { "name": "Vestibule 1 (Armory)", "text": { "security": "Inventory: 1 M41A pulse rifle. 1 case of shotgun shells." } },
+    "vestibule2": { "name": "Vestibule 2 (EVA Suits)", "text": { "security": "Inventory: 2 EVA suits." } },
+    "junctionb1": { "name": "Junction B-1", "text": { "crew": "Access A-C via ladder." } },
+    "messhall": { "name": "Mess Hall", "text": { "crew": "" } },
+    "corporatesuite": {
+      "name": "Corporate Suite",
+      "requires": ["company"],
+      "text": { "company": "Company access required. Escape pod fully operational." }
+    },
+    "medlab": {
+      "name": "Med Lab",
+      "text": {
+        "crew": "Alien specimens contained.",
+        "research": "Alien specimens contained. Medpod 1 is damaged but operational. Medpod 2 is in use."
+      }
+    },
+    "sciencelab1": { "name": "Science Lab 1", "text": { "research": "Fungal organisms detected." } },
+    "sciencelab2": { "name": "Science Lab 2", "text": { "crew": "" } },
+    "junctionb2": { "name": "Junction B-2", "text": { "crew": "Ladder allows access to other decks." } },
+    "livingarea": { "name": "Living Quarters", "text": { "research": "Fungal organisms detected." } },
+    "sciencemodule": { "name": "Science Module", "text": { "crew": "Science module ejected from the ship." } },
+    "reactorcore": { "name": "Reactor Core", "text": { "crew": "Fission reactor core." } },
+    "junctionc1": { "name": "Junction C-1", "text": { "crew": "Deck access A-C." } },
+    "leftstorage": { "name": "Port Storage", "text": { "security": "Inventory: 7 drums of quinitricetyline. WARNING: highly unstable." } },
+    "rightstorage": { "name": "Starboard Storage", "text": { "security": "Inventory: 2 bolt guns, 1 cutting torch, 1 maintenance jack." } },
+    "cargobay1": { "name": "Cargo Bay 1", "text": { "crew": "Inventory: food stores." } },
+    "cargobay2": { "name": "Cargo Bay 2", "text": { "crew": "Inventory: spare RV tires." } },
+    "cargooffice": { "name": "Cargo Office", "text": { "crew": "" } },
+    "junctionc2": { "name": "Junction C-2", "text": { "crew": "Access decks A-C." } },
+    "coolanttanks": {
+      "name": "Coolant Tanks",
+      "text": {
+        "crew": "Coolant tanks prevent overloading.",
+        "security": "Damaging the coolant tanks could lead to reactor critical mass. Accessible via service tunnels."
+      }
+    },
+    "catwalk": { "name": "Catwalk", "text": { "crew": "Overlooks the deck D vehicle bay." } },
+    "reactorrelaycontrol": {
+      "name": "Reactor Relay Control",
+      "text": {
+        "security": "Alert: relay disconnected from four fission engines. Unable to engage the displacement drive. Warning: radiation leak detected. Power from the four engine pods channels through the main relay here. Forbidden area: emergency self destruct is accessible here."
+      }
+    },
+    "vehiclebay": { "name": "Vehicle Bay", "text": { "crew": "Inventory: 2 ATVs." } },
+    "equshed": { "name": "EQU Shed", "text": { "crew": "" } },
+    "vehiclepartsstorage": { "name": "Vehicle Parts Storage", "text": { "crew": "" } },
+    "dispatchoffice": { "name": "Dispatch Office", "text": { "crew": "" } }
+  },
+  "decks": [
+    {
+      "id": "A",
+      "name": "Deck A",
+      "width": 500,
+      "height": 1000,
+      "schematics": {
+        "public": "images/DeckA.png",
+        "crew": "images/DeckA.png",
+        "research": "images/DeckAAccess.png",
+        "security": "images/DeckAAccess.png",
+        "command": "images/DeckAAccess.png",
+        "company": "images/DeckAAccess.png"
+      },
+      "hotspots": [
+        { "room": "mother", "shape": "circle", "coords": "243,283,44" },
+        { "room": "junctiona1", "shape": "circle", "coords": "240,422,38" },
+        { "room": "stairwell", "shape": "circle", "coords": "241,572,41" },
+        { "room": "airscrubbers", "shape": "circle", "coords": "241,653,39" },
+        { "room": "cryochambers", "shape": "rect", "coords": "152,728,341,847" },
+        { "room": "examinationroom", "shape": "rect", "coords": "198,848,284,901" },
+        { "room": "junctiona2", "shape": "circle", "coords": "241,933,39" },
+        { "room": "leftshowers", "shape": "rect", "coords": "141,851,174,932" },
+        { "room": "rightshowers", "shape": "rect", "coords": "305,848,339,931" },
+        { "room": "leftelevator", "shape": "rect", "coords": "53,691,124,724" },
+        { "room": "rightelevator", "shape": "rect", "coords": "361,687,431,726" },
+        { "room": "evastorage", "shape": "rect", "coords": "128,935,196,967" },
+        { "room": "evastorage", "shape": "rect", "coords": "305,935,366,966" }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Deck B",
+      "width": 500,
+      "height": 1000,
+      "schematics": {
+        "public": "images/DeckB.png",
+        "crew": "images/DeckB.png",
+        "research": "images/DeckBAccess.png",
+        "security": "images/DeckBAccess.png",
+        "command": "images/DeckBAccess.png",
+        "company": "images/DeckBAccess.png"
+      },
+      "hotspots": [
+        { "room": "bridge", "shape": "circle", "coords": "244,139,122" },
+        { "room": "escapepods", "shape": "rect", "coords": "116,285,191,307" },
+        { "room": "escapepods", "shape": "rect", "coords": "296,283,376,309" },
+        { "room": "vestibule1", "shape": "rect", "coords": "118,309,191,423" },
+        { "room": "vestibule2", "shape": "rect", "coords": "297,309,372,412" },
+        { "room": "junctionb1", "shape": "rect", "coords": "208,287,282,384" },
+        { "room": "stairwell", "shape": "circle", "coords": "247,444,34" },
+        { "room": "airscrubbers", "shape": "circle", "coords": "245,513,34" },
+        { "room": "messhall", "shape": "rect", "coords": "301,415,360,542" },
+        { "room": "leftelevator", "shape": "rect", "coords": "87,540,126,574" },
+        { "room": "rightelevator", "shape": "rect", "coords": "364,541,397,572" },
+        { "room": "livingarea", "shape": "rect", "coords": "132,540,363,625" },
+        { "room": "medlab", "shape": "rect", "coords": "131,627,192,766" },
+        { "room": "sciencelab2", "shape": "rect", "coords": "215,629,363,685" },
+        { "room": "sciencelab1", "shape": "rect", "coords": "280,699,363,768" },
+        { "room": "junctionb2", "shape": "rect", "coords": "213,710,277,767" },
+        { "room": "reactorcore", "shape": "rect", "coords": "217,770,278,829" },
+        { "room": "sciencemodule", "shape": "rect", "coords": "116,775,212,969" },
+        { "room": "sciencemodule", "shape": "rect", "coords": "284,769,370,976" },
+        { "room": "sciencemodule", "shape": "rect", "coords": "176,834,318,972" },
+        { "room": "corporatesuite", "shape": "rect", "coords": "117,428,193,507" }
+      ]
+    },
+    {
+      "id": "C",
+      "name": "Deck C",
+      "width": 500,
+      "height": 1000,
+      "schematics": {
+        "public": "images/DeckC.png",
+        "crew": "images/DeckC.png",
+        "research": "images/DeckCAccess.png",
+        "security": "images/DeckCAccess.png",
+        "command": "images/DeckCAccess.png",
+        "company": "images/DeckCAccess.png"
+      },
+      "hotspots": [
+        { "room": "junctionc1", "shape": "circle", "coords": "246,106,49" },
+        { "room": "stairwell", "shape": "circle", "coords": "250,262,45" },
+        { "room": "airscrubbers", "shape": "circle", "coords": "249,355,42" },
+        { "room": "leftelevator", "shape": "rect", "coords": "39,398,87,430" },
+        { "room": "rightelevator", "shape": "rect", "coords": "406,393,455,429" },
+        { "room": "catwalk", "shape": "rect", "coords": "121,403,412,596" },
+        { "room": "cargobay1", "shape": "rect", "coords": "65,251,179,397" },
+        { "room": "cargobay2", "shape": "rect", "coords": "317,249,424,395" },
+        { "room": "leftstorage", "shape": "rect", "coords": "74,195,174,244" },
+        { "room": "rightstorage", "shape": "rect", "coords": "315,200,423,245" },
+        { "room": "coolanttanks", "shape": "circle", "coords": "133,663,47" },
+        { "room": "coolanttanks", "shape": "circle", "coords": "362,661,44" },
+        { "room": "junctionc2", "shape": "circle", "coords": "250,664,48" },
+        { "room": "reactorcore", "shape": "circle", "coords": "250,776,49" },
+        { "room": "reactorrelaycontrol", "shape": "circle", "coords": "367,773,48" },
+        { "room": "cargooffice", "shape": "rect", "coords": "73,466,132,572" }
+      ]
+    },
+    {
+      "id": "D",
+      "name": "Deck D",
+      "width": 500,
+      "height": 1000,
+      "schematics": {
+        "public": "images/DeckD.png",
+        "crew": "images/DeckD.png",
+        "research": "images/DeckDAccess.png",
+        "security": "images/DeckDAccess.png",
+        "command": "images/DeckDAccess.png",
+        "company": "images/DeckDAccess.png"
+      },
+      "hotspots": [
+        { "room": "vehiclebay", "shape": "rect", "coords": "78,136,409,647" },
+        { "room": "equshed", "shape": "rect", "coords": "81,661,151,696" },
+        { "room": "vehiclepartsstorage", "shape": "rect", "coords": "159,659,333,700" },
+        { "room": "dispatchoffice", "shape": "rect", "coords": "338,658,417,693" }
+      ]
+    }
+  ]
+}

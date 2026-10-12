@@ -1,0 +1,8 @@
+{
+  "ship": "astraeus",
+  "salt": "astraeus-computer-v1",
+  "algorithm": "SHA-256 hex of salt + ':' + PIN, PIN uppercased. The terminal loads only the hashes in data/astraeus/ship.json.",
+  "pins": {
+    "public": ["1111"]
+  }
+}

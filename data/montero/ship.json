@@ -1,0 +1,169 @@
+{
+  "id": "montero",
+  "name": "USCSS Montero",
+  "computer": "MU/TH/UR 6000",
+  "salt": "uscss-montero-v1",
+  "date": "12.11.2183",
+  "schematicOrder": ["public", "crew", "research", "security", "command", "company"],
+  "clearanceInherits": {
+    "public": [],
+    "crew": ["public"],
+    "security": ["crew"],
+    "research": ["crew"],
+    "command": ["security", "research"],
+    "company": ["command"]
+  },
+  "clearanceGrants": {
+    "public": {
+      "modules": ["personnel", "status"],
+      "mail": [],
+      "notes": [],
+      "schematic": "public",
+      "rosterDetail": false
+    },
+    "crew": {
+      "modules": ["mail", "personnel", "status", "logs", "notes"],
+      "mail": ["self", "broadcast"],
+      "notes": ["self"],
+      "schematic": "crew",
+      "rosterDetail": false
+    },
+    "security": {
+      "modules": ["mail", "personnel", "status", "logs", "notes"],
+      "mail": ["self", "broadcast", "clearance:security"],
+      "notes": ["self", "clearance:security"],
+      "schematic": "security",
+      "rosterDetail": true
+    },
+    "research": {
+      "modules": ["mail", "personnel", "status", "logs", "notes"],
+      "mail": ["self", "broadcast", "clearance:research"],
+      "notes": ["self", "clearance:research"],
+      "schematic": "research",
+      "rosterDetail": false
+    },
+    "command": {
+      "modules": ["mail", "personnel", "status", "logs", "notes"],
+      "mail": ["self", "broadcast", "clearance:command", "clearance:security", "clearance:research", "clearance:crew"],
+      "notes": ["self", "clearance:command", "clearance:security", "clearance:research", "clearance:crew"],
+      "schematic": "command",
+      "rosterDetail": true
+    },
+    "company": {
+      "modules": ["mail", "personnel", "status", "logs", "notes"],
+      "mail": ["self", "broadcast", "clearance:company", "clearance:command", "clearance:research"],
+      "notes": ["self", "clearance:company", "clearance:command", "clearance:research"],
+      "schematic": "company",
+      "rosterDetail": true
+    }
+  },
+  "modules": [
+    { "id": "mail", "label": "Mail" },
+    { "id": "notes", "label": "Notes" },
+    { "id": "personnel", "label": "Personnel" },
+    { "id": "status", "label": "Ship status" },
+    { "id": "logs", "label": "Logs" }
+  ],
+  "tasks": [],
+  "contacts": [
+    { "id": "wy-corporate", "name": "Weyland-Yutani Dispatch" }
+  ],
+  "directories": {
+    "wy-corporate": "Weyland-Yutani Corporate"
+  },
+  "accounts": [
+    {
+      "id": "m-miller",
+      "name": "Vanessa Miller",
+      "job": "Captain",
+      "clearance": ["command"],
+      "status": "Unaccounted",
+      "listed": true
+    },
+    {
+      "id": "m-davis",
+      "name": "Leah Davis",
+      "job": "Pilot",
+      "clearance": ["crew"],
+      "status": "Deceased",
+      "listed": true
+    },
+    {
+      "id": "k-rye",
+      "name": "Kayla Rye",
+      "job": "Roughneck",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
+    },
+    {
+      "id": "l-cham",
+      "name": "Lyron Cham",
+      "job": "Technician",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
+    },
+    {
+      "id": "j-wilson",
+      "name": "John J. Wilson",
+      "job": "Company agent",
+      "clearance": ["crew"],
+      "status": "Aboard",
+      "listed": true
+    }
+  ],
+  "systems": [
+    {
+      "id": "haulage",
+      "name": "Haulage",
+      "state": "Derelict",
+      "options": "Online;Loaded;Derelict;Offline",
+      "clearance": "public",
+      "level": "CRITICAL",
+      "detail": { "company": "Last filed route ends off the company chart." }
+    },
+    {
+      "id": "distress",
+      "name": "Distress beacon",
+      "state": "Silent",
+      "options": "Silent;Transmitting;Intermittent;Offline",
+      "clearance": "public",
+      "level": "WARNING",
+      "detail": { "company": "Beacon log ends mid-transmission. No recovery is confirmed on this table." }
+    }
+  ],
+  "logs": [
+    {
+      "id": "montero-departure",
+      "time": "11-11-2183",
+      "clearance": ["company"],
+      "text": "Montero departed under company charter. Auditor copy filed."
+    },
+    {
+      "id": "montero-beacon",
+      "time": "12-11-2183",
+      "clearance": ["company"],
+      "text": "Distress beacon received, then lost."
+    }
+  ],
+  "mail": [
+    {
+      "id": "montero-charter",
+      "subject": "Charter amendment",
+      "from": "wy-corporate",
+      "to": "s-park",
+      "time": "11-10-2183",
+      "body": "Auditor Park may open Montero records from a company terminal. What you see is this table's copy. Another table's status is not yours."
+    }
+  ],
+  "notes": [
+    {
+      "id": "montero-note",
+      "owner": "s-park",
+      "title": "Montero follow-up",
+      "time": "12-11-2183",
+      "body": "Match the beacon cutoff to the ship whose terminal opened this packet. Do not carry another table's roster across."
+    }
+  ]
+}

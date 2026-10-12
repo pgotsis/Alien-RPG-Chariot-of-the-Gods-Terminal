@@ -1,0 +1,24 @@
+{
+	"ship": "cronus",
+	"salt": "uscss-cronus-muthr-v1",
+	"algorithm": "SHA-256 hex of salt + ':' + PIN, PIN uppercased. The terminal loads only the hashes in data/cronus/ship.json.",
+	"pins": {
+		"public": ["1111", "1234"],
+		"a-johns": "1987",
+		"v-reid": "2654",
+		"l-flynn": "3321",
+		"d-cooper": "4987",
+		"ava": "5654",
+		"r-walker": "6321",
+		"e-tenwick": "7987",
+		"c-reynolds": "8654",
+		"l-clayton": "9321",
+		"s-park": "7042"
+	},
+	"overrides": {
+		"s-park": "48193726"
+	},
+	"codes": {
+		"ava-reactivation": "B833J99"
+	}
+}
