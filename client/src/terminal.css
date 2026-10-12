@@ -194,7 +194,7 @@ button, input, textarea {
 
 .who { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
 
-.keypad { max-width: 18rem; }
+.keypad { max-width: 18rem; margin-inline: auto; }
 .key { flex: 1 1 30%; min-height: 3.2rem; font-size: 1.2rem; }
 .pin-dots { font-size: 1.6rem; letter-spacing: 0.35rem; min-height: 2rem; color: var(--AGreen); }
 

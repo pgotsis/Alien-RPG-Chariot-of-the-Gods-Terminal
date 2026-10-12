@@ -13,7 +13,16 @@
 		"e-tenwick": "7987",
 		"c-reynolds": "8654",
 		"l-clayton": "9321",
-		"s-park": "7042"
+		"s-park": "7042",
+		"s-andrews": "2101",
+		"s-boyd": "2238",
+		"m-carter": "2375",
+		"a-garcia": "2512",
+		"r-lynch": "2649",
+		"w-marshall": "2786",
+		"a-moreno": "2923",
+		"t-nguyen": "3060",
+		"j-walthorp": "3197"
 	},
 	"overrides": {
 		"s-park": "48193726"
