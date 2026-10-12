@@ -69,6 +69,18 @@ location /apps/this-tool/ {
 
 `proxy_pass` has no trailing slash, so the prefix is still on the path when it reaches the app. The plaintext pin list in `gm/` is not served.
 
+# GM table editor
+
+The GM desk has a table list and a separate editor with a section sidebar. Select ships by name. Roster changes (name, title, status, clearance and PIN), new crew and portraits are saved on that table. PIN overrides replace the previous access code; only salted hashes are stored. Defaults for printing cards are in `gm/<ship>/pins.json`; table-specific overrides do not rewrite those template files. Players receive roster, blueprint and navigation changes on the next refresh, including while on the login screen.
+
+Systems offer adventure presets, editable state choices, severity, visibility and clearance-specific descriptions. Logs, announcements and mail include the original scenario entries and can be edited, added or removed with an adventure date. Announcements and mail are separate: public announcements require `public` visibility; crew/public mail recipients are broadcasts.
+
+Blueprints allow image layers per clearance, deck dimensions, room hotspots and room descriptions. Choose an existing image or an HTTPS image URL. The command/company Star map is a schematic navigation grid with editable ship position and waypoints, not an astronomical chart. Its position starts unconfirmed until the GM sets it.
+
+Prepared events save transmissions, dated log entries, system changes and roster changes ahead of play. Saving does not send anything. **Push event** applies all changes in one transaction; a rejected change leaves the event unapplied. Events remain available for editing and reuse, and show when they were last pushed. Pushing a transmission again creates another entry.
+
+All table edits and prepared events persist in `DATA_DIR/app.sqlite`. New tables use the current scenario defaults; existing table statuses are preserved. Run `npm test` for the GM persistence and editing checks.
+
 # Demo
 https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/
 

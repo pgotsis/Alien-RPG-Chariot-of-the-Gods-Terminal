@@ -421,3 +421,34 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 	.pin-dots { letter-spacing: 0.2rem; }
 	.wordmark { font-size: calc(var(--mark, 2.4rem) * 0.72); }
 }
+
+.gm-editor-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.gm-editor { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.gm-sidebar { display: flex; flex-direction: column; gap: 0.5rem; position: sticky; top: 1rem; }
+.gm-sidebar .term-btn { text-align: left; }
+.gm-section { min-width: 0; }
+.gm-section a { color: var(--AGreen); }
+.gm-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.75rem; align-items: start; margin-bottom: 0.75rem; }
+.gm-fields > label { min-width: 0; }
+.gm-fields input, .gm-fields select, .gm-fields textarea { max-width: none; min-width: 0; box-sizing: border-box; }
+.gm-fields select[multiple] { min-height: 5rem; }
+.gm-section .panel { margin-bottom: 1rem; }
+.gm-section details { margin-bottom: 0.75rem; }
+.gm-section summary { cursor: pointer; padding: 0.5rem 0; }
+.gm .gm-inline input, .gm .gm-portrait-choice input { display: inline-block; width: auto; }
+.gm-portrait { width: 4rem; height: 4rem; object-fit: cover; margin-bottom: 0.5rem; }
+.gm-portraits { display: flex; flex-wrap: wrap; gap: 0.6rem; max-height: 22rem; overflow-y: auto; margin-bottom: 1rem; border: 1px solid var(--AGreen); }
+.gm-portrait-choice { width: 5rem; font-size: 0.7rem; padding: 0.3rem; border: 1px solid transparent; cursor: pointer; }
+.gm-portrait-choice.on { border-color: var(--AGreen); }
+.gm-portrait-choice img { display: block; width: 100%; height: 5rem; object-fit: cover; }
+.gm-blueprint-preview { max-width: 100%; max-height: 25rem; object-fit: contain; }
+.star-map { display: block; width: 100%; max-width: 45rem; aspect-ratio: 1; background: #070806; color: var(--AGreen); overflow: visible; }
+.star-map circle { fill: currentColor; }
+.star-map text { fill: currentColor; font-size: 2.2px; }
+.star-map path { fill: none; stroke: currentColor; stroke-width: 0.2; }
+.star-map .star-grid { opacity: 0.2; }
+.star-map .ship-position { color: var(--CommandColor); }
+@media (max-width: 800px) {
+	.gm-editor { grid-template-columns: 1fr; }
+	.gm-sidebar { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
