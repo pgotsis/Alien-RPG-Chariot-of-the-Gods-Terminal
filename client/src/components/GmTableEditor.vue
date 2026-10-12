@@ -1,5 +1,7 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import GmFacilityEditor from "./GmFacilityEditor.vue";
+import GmLinkTools from "./GmLinkTools.vue";
 import GmCueEditor from "./GmCueEditor.vue";
 import GmRosterEditor from "./GmRosterEditor.vue";
 import GmSystemsEditor from "./GmSystemsEditor.vue";
@@ -12,7 +14,7 @@ const section = ref("table");
 const sections = [
 	["table", "Table settings"],
 	["cues", "Prepared events"],
-	["ships", "Ships & access"],
+	["ships", "Facility & access"],
 	["roster", "Roster & PINs"],
 	["systems", "Systems"],
 	["blueprints", "Blueprints"],
@@ -20,9 +22,16 @@ const sections = [
 	["logs", "Logs"],
 	["announcements", "Announcements"],
 	["mail", "Mail"],
-	["transfer", "Move personal data"],
+	["transfer", "Crew registration"],
 ];
 const ship = computed(() => props.detail.ships.find((item) => item.id === props.shipId));
+const baseDate = ref(props.detail.currentDate.slice(0, 16));
+watch(
+	() => props.detail.currentDate,
+	(value) => {
+		if (document.activeElement?.dataset.field !== "clock") baseDate.value = value.slice(0, 16);
+	},
+);
 const comment = ref(props.detail.comment || "");
 const moveAccount = ref("");
 const moveTo = ref("");
@@ -59,8 +68,43 @@ function toggleShip(id, on) {
 			<section v-if="section === 'table'">
 				<h2>Table settings</h2>
 				<p>
-					<a :href="playerUrl(detail.code)">Player link · {{ detail.code }}</a>
+					<a :href="playerUrl(detail.code)">Campaign link · {{ detail.code }}</a>
+					<GmLinkTools :link="playerUrl(detail.code)" :title="'Campaign ' + detail.code" />
 				</p>
+				<form class="panel" @submit.prevent="patch({ baseDate: baseDate + ':00Z' })">
+					<h3>Terminal date & time</h3>
+					<p class="hint">
+						The campaign clock runs in real time. Set its base date or jump ahead. Message and log
+						dates are unchanged. Campaign times use UTC.
+					</p>
+					<div class="gm-fields">
+						<label
+							>Base date<input
+								v-model="baseDate"
+								type="datetime-local"
+								required
+								data-field="clock" /></label
+						><button class="term-btn" type="submit">Set date</button>
+					</div>
+					<div class="actions">
+						<button
+							v-for="[minutes, label] in [
+								[5, '5 min'],
+								[30, '30 min'],
+								[60, '1 hour'],
+								[120, '2 hours'],
+								[180, '3 hours'],
+								[300, '5 hours'],
+							]"
+							:key="minutes"
+							class="term-btn quiet"
+							type="button"
+							@click="patch({ advanceMinutes: minutes })"
+						>
+							+ {{ label }}
+						</button>
+					</div>
+				</form>
 				<label
 					>Comment<textarea v-model="comment" class="scratch" data-field="comment"></textarea>
 				</label>
@@ -71,50 +115,7 @@ function toggleShip(id, on) {
 					</button>
 				</div>
 			</section>
-			<section v-else-if="section === 'ships'">
-				<h2>Ships & player access</h2>
-				<p class="hint">
-					Players start on the home ship. At least one ship must remain on the table.
-				</p>
-				<article v-for="item in detail.catalog" :key="item.id" class="panel">
-					<label class="gm-inline"
-						><input
-							type="checkbox"
-							:checked="detail.ships.some((ship) => ship.id === item.id)"
-							:disabled="detail.ships.length === 1 && detail.ships[0].id === item.id"
-							@change="toggleShip(item.id, $event.target.checked)"
-						/>
-						{{ item.name }}</label
-					>
-					<div v-if="detail.ships.some((ship) => ship.id === item.id)" class="actions">
-						<button
-							class="term-btn"
-							type="button"
-							:class="{ on: detail.homeShip === item.id }"
-							@click="patch({ home: item.id })"
-						>
-							{{ detail.homeShip === item.id ? "Home ship" : "Make home ship" }}
-						</button>
-						<button
-							class="term-btn"
-							type="button"
-							@click="
-								patch({
-									access: {
-										[item.id]: !detail.ships.find((ship) => ship.id === item.id).playerAccess,
-									},
-								})
-							"
-						>
-							{{
-								detail.ships.find((ship) => ship.id === item.id).playerAccess
-									? "Close to players"
-									: "Open to players"
-							}}
-						</button>
-					</div>
-				</article>
-			</section>
+			<GmFacilityEditor v-else-if="section === 'ships'" :detail="detail" @patch="patch" />
 			<template v-else-if="ship">
 				<nav class="folder-row" aria-label="Ship to edit">
 					<button
@@ -133,6 +134,9 @@ function toggleShip(id, on) {
 					v-else-if="section === 'roster'"
 					:ship="ship"
 					:portraits="detail.portraits"
+					:facilities="detail.ships"
+					:table-code="detail.code"
+					:player-url="playerUrl"
 					@patch="patch"
 				/>
 				<GmSystemsEditor v-else-if="section === 'systems'" :ship="ship" @patch="patch" />
@@ -140,9 +144,15 @@ function toggleShip(id, on) {
 					v-else-if="section === 'blueprints'"
 					:ship="ship"
 					:images="detail.blueprintImages"
+					:table-code="detail.code"
 					@patch="patch"
 				/>
-				<GmStarMapEditor v-else-if="section === 'starmap'" :ship="ship" @patch="patch" />
+				<GmStarMapEditor
+					v-else-if="section === 'starmap'"
+					:ship="ship"
+					:table-code="detail.code"
+					@patch="patch"
+				/>
 				<GmDocumentEditor
 					v-else-if="section === 'logs'"
 					key="logs"
@@ -168,9 +178,15 @@ function toggleShip(id, on) {
 					@patch="patch"
 				/>
 				<section v-else-if="section === 'transfer'">
-					<h2>Move personal data</h2>
+					<h2>Register crew at another facility</h2>
 					<p class="hint">
-						Move mail and station notes; schematics, logs and status stay on their ship.
+						Use this when crew leave one facility and board another, such as Montero to Cronus or a
+						ship to a station. Select their current facility above and register them at the
+						destination below. Their personal mail and notes are shared across the table and
+						available at every facility where they are registered; nothing is copied or removed. The
+						source registration remains, so you may mark the crew member Off ship separately.
+						Facility logs, broadcasts, systems, blueprints and ship files stay local. Only the GM
+						can register crew, including at a facility that is still closed to players.
 					</p>
 					<form
 						@submit.prevent="
@@ -192,8 +208,8 @@ function toggleShip(id, on) {
 									</option>
 								</select></label
 							><label
-								>Destination ship<select v-model="moveTo" required>
-									<option value="">Select ship</option>
+								>Destination facility<select v-model="moveTo" required>
+									<option value="">Select facility</option>
 									<option
 										v-for="item in detail.ships.filter((item) => item.id !== shipId)"
 										:key="item.id"
@@ -204,7 +220,7 @@ function toggleShip(id, on) {
 								</select></label
 							>
 						</div>
-						<button class="term-btn" type="submit">Move personal data</button>
+						<button class="term-btn" type="submit">Register crew</button>
 					</form>
 				</section>
 			</template>

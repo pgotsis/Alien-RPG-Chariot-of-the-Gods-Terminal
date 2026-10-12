@@ -5,6 +5,27 @@ const props = defineProps({ kind: String, entries: Array, ship: Object });
 const emit = defineEmits(["patch"]);
 const labels = { Log: "Logs", Announcement: "Announcements", Mail: "Mail" };
 const rows = ref([]);
+const fromFilter = ref("");
+const toFilter = ref("");
+const search = ref("");
+const filteredRows = computed(() =>
+	rows.value.filter(
+		(item) =>
+			(!fromFilter.value || item.from === fromFilter.value) &&
+			(!toFilter.value || item.to === toFilter.value) &&
+			(!search.value ||
+				[item.subject, item.body].join(" ").toLowerCase().includes(search.value.toLowerCase())),
+	),
+);
+const participants = computed(() => [
+	...new Set(rows.value.flatMap((item) => [item.from, item.to]).filter(Boolean)),
+]);
+function participant(id) {
+	return (
+		senders.value.find((item) => item.id === id)?.name ||
+		(id === "crew" ? "Crew broadcast" : id === "public" ? "Public broadcast" : id)
+	);
+}
 const blank = () => ({
 	title: "",
 	subject: "",
@@ -37,6 +58,9 @@ watch(
 	() => props.ship.id,
 	() => {
 		rows.value = props.entries.map(normalize);
+		fromFilter.value = "";
+		toFilter.value = "";
+		search.value = "";
 		entry.value = blank();
 	},
 );
@@ -71,9 +95,36 @@ function remove(item) {
 			Dates are in the adventure calendar. Existing date formats are preserved; enter a date such as
 			2183-11-12 14:30.
 		</p>
-		<p v-if="!rows.length" class="hint">No entries yet.</p>
+		<div v-if="kind === 'Mail'" class="gm-fields panel">
+			<label
+				>From<select v-model="fromFilter">
+					<option value="">All senders</option>
+					<option v-for="id in participants" :key="id" :value="id">{{ participant(id) }}</option>
+				</select></label
+			><label
+				>To<select v-model="toFilter">
+					<option value="">All recipients</option>
+					<option v-for="id in participants" :key="id" :value="id">{{ participant(id) }}</option>
+				</select></label
+			><label>Search<input v-model="search" placeholder="Subject or message text" /></label
+			><button
+				class="term-btn quiet"
+				type="button"
+				@click="
+					fromFilter = '';
+					toFilter = '';
+					search = '';
+				"
+			>
+				Clear filters
+			</button>
+		</div>
+		<p v-if="kind === 'Mail'" class="hint">
+			{{ filteredRows.length }} of {{ rows.length }} messages
+		</p>
+		<p v-if="!filteredRows.length" class="hint">No entries yet.</p>
 		<form
-			v-for="item in [...rows, entry]"
+			v-for="item in [...(kind === 'Mail' ? filteredRows : rows), entry]"
 			:key="item.id || 'new'"
 			class="panel gm-document"
 			@submit.prevent="save(item, !item.id)"

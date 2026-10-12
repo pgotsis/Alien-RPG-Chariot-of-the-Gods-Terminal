@@ -112,7 +112,7 @@
       "id": "j-wilson",
       "name": "John J. Wilson",
       "job": "Corporate Liaison",
-      "clearance": ["crew"],
+      "clearance": ["company"],
       "status": "Aboard",
       "listed": true,
       "pinHash": "e885656245133ca26027b3fa65f4956dcf937582ffd3e38b246731e32d40492c"

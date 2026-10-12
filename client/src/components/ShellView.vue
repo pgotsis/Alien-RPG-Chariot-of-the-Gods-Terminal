@@ -29,9 +29,7 @@ const tabs = computed(function () {
 	return list;
 });
 
-const others = computed(() => (
-	(terminal.state.ships || []).filter((ship) => terminal.state.ship && ship.id !== terminal.state.ship.id)
-));
+
 
 watch(tabs, function (list) {
 	if (!list.length) return;
@@ -74,28 +72,11 @@ watch(tabs, function (list) {
 		@submit.prevent="terminal.submitOverride"
 	>
 		<h2>Company override</h2>
-		<p class="hint">Eight digits. Opens this table's copy of your other ship.</p>
+		<p class="hint">Eight digits. Opens the configured AI at company clearance, without crew registration or private mail, notes or files.</p>
 		<input v-model="terminal.state.overrideCode" inputmode="numeric" maxlength="8" autocomplete="off" />
 		<p v-if="terminal.state.overrideError" class="error">{{ terminal.state.overrideError }}</p>
 		<button class="term-btn" type="submit">Submit code</button>
 	</form>
-
-	<div
-		v-if="terminal.state.account && others.length"
-		class="panel"
-	>
-		<h2>Personal data</h2>
-		<p class="hint">Moves your mail and station notes. Schematics, logs, and ship status stay on this computer.</p>
-		<div class="actions">
-			<button
-				v-for="ship in others"
-				:key="ship.id"
-				class="term-btn"
-				type="button"
-				@click="terminal.transferPersonal(ship.id)"
-			>Move my personal data to {{ ship.name }}</button>
-		</div>
-	</div>
 
 	<div class="actions">
 		<button class="term-btn quiet" type="button" @click="terminal.logout">Log out</button>

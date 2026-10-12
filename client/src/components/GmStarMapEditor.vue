@@ -1,34 +1,31 @@
 <script setup>
 import { ref, watch } from "vue";
+import GmImageUpload from "./GmImageUpload.vue";
 import StarMapPlot from "./StarMapPlot.vue";
-const props = defineProps({ ship: Object });
+const props = defineProps({ ship: Object, tableCode: String });
 const emit = defineEmits(["patch"]);
 const map = ref(null);
 const backgroundError = ref("");
-async function uploadBackground(event) {
-	backgroundError.value = "";
-	const file = event.target.files[0];
-	if (!file) return;
-	if (
-		!["image/png", "image/jpeg", "image/webp"].includes(file.type) ||
-		file.size > 2 * 1024 * 1024
-	) {
-		backgroundError.value = "Choose a PNG, JPEG or WebP image up to 2 MB.";
-		event.target.value = "";
-		return;
-	}
-	try {
-		map.value.background = await new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result);
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
-		});
-	} catch {
-		backgroundError.value = "The image could not be read. Try another file.";
-	}
-	event.target.value = "";
+const uploading = ref(false);
+const locations = [
+	"Position unconfirmed",
+	"Sol",
+	"Gateway Station",
+	"26 Draconis",
+	"LV-1113",
+	"XCD-14",
+	"Impon VII",
+	"Anchorpoint Station",
+	"LV-426",
+	"Sutter's World",
+	"KG-348",
+	"Custom position",
+];
+const chosenPosition = ref("Position unconfirmed");
+function choosePosition() {
+	if (chosenPosition.value !== "Custom position") map.value.position.name = chosenPosition.value;
 }
+
 watch(
 	() => props.ship,
 	(ship) => {
@@ -39,6 +36,9 @@ watch(
 			...JSON.parse(JSON.stringify(ship.starMap)),
 		};
 		backgroundError.value = "";
+		chosenPosition.value = locations.includes(map.value.position.name)
+			? map.value.position.name
+			: "Custom position";
 	},
 	{ immediate: true },
 );
@@ -53,11 +53,14 @@ watch(
 		<form @submit.prevent="emit('patch', { starMap: map })">
 			<div class="gm-fields">
 				<label
-					>Ship position / system<input
+					>Ship position / system<select v-model="chosenPosition" @change="choosePosition">
+						<option v-for="location in locations" :key="location">{{ location }}</option></select
+					><input
+						v-if="chosenPosition === 'Custom position'"
 						v-model="map.position.name"
 						required
 						maxlength="200"
-						placeholder="26 Draconis · LV-1113" /></label
+						placeholder="System or facility name" /></label
 				><label
 					>X<input
 						v-model.number="map.position.x"
@@ -92,10 +95,10 @@ watch(
 							@input="map.background = $event.target.value"
 					/></label>
 					<label
-						>Upload image<input
-							type="file"
-							accept="image/png,image/jpeg,image/webp"
-							@change="uploadBackground"
+						>Upload image<GmImageUpload
+							:table-code="tableCode"
+							@uploaded="map.background = $event"
+							@busy="uploading = $event"
 					/></label>
 					<label
 						>Image fit<select v-model="map.backgroundFit">
@@ -162,7 +165,7 @@ watch(
 			<label
 				>Navigation notes<textarea v-model="map.notes" maxlength="4000" rows="3"></textarea>
 			</label>
-			<button class="term-btn" type="submit">Save star map</button>
+			<button class="term-btn" type="submit" :disabled="uploading">Save star map</button>
 		</form>
 	</section>
 </template>

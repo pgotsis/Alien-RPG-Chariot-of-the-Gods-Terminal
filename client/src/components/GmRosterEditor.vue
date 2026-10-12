@@ -1,7 +1,14 @@
 <script setup>
+import GmLinkTools from "./GmLinkTools.vue";
 import GmClearanceSelect from "./GmClearanceSelect.vue";
 import { ref, watch } from "vue";
-const props = defineProps({ ship: Object, portraits: Array });
+const props = defineProps({
+	ship: Object,
+	portraits: Array,
+	tableCode: String,
+	playerUrl: Function,
+	facilities: Array,
+});
 const emit = defineEmits(["patch"]);
 const statuses = [
 	"Aboard",
@@ -27,14 +34,25 @@ watch(
 	(ship) => {
 		crew.value = JSON.parse(JSON.stringify(ship.accounts)).map((account) => ({
 			...account,
+			currentPin: account.pin || "",
 			pin: "",
 		}));
 	},
 	{ immediate: true },
 );
+function link(account) {
+	if (!account.currentPin) return "";
+	const url = new URL(props.playerUrl(props.tableCode, props.ship.id));
+	url.searchParams.set("code", account.currentPin);
+	return url.href;
+}
+
 function save(account) {
 	const { id, name, job, status, clearance, pin, photo } = account;
-	emit("patch", { updateCrew: { id, name, job, status, clearance, pin, photo } });
+	const override = clearance.includes("company")
+		? { overrideCode: account.overrideCode, overrideTarget: account.overrideTarget }
+		: {};
+	emit("patch", { updateCrew: { id, name, job, status, clearance, pin, photo, ...override } });
 }
 function add() {
 	emit("patch", { createCrew: { ...newCrew.value } }, () => {
@@ -80,7 +98,44 @@ function availableStatuses(account) {
 						:placeholder="account.hasPin ? 'Keep current PIN' : 'No PIN assigned'"
 				/></label>
 			</div>
+			<div v-if="account.clearance.includes('company')" class="gm-fields gm-company-override">
+				<label
+					>Company override<input
+						v-model="account.overrideCode"
+						inputmode="numeric"
+						pattern="[0-9]{8}"
+						minlength="8"
+						maxlength="8"
+						placeholder="8 digits"
+				/></label>
+				<label
+					>Target AI<select v-model="account.overrideTarget">
+						<option value="" :disabled="facilities.length > 1">No other AI configured</option>
+						<option
+							v-for="facility in facilities.filter((item) => item.id !== ship.id)"
+							:key="facility.id"
+							:value="facility.id"
+						>
+							{{ facility.name }} · {{ facility.computer }}
+						</option>
+					</select></label
+				>
+				<p class="hint">
+					Company-level remote access only. No crew registration or private personal data is
+					granted.
+				</p>
+			</div>
+			<span class="gm-pin-display"
+				>Current PIN:
+				<strong>{{ account.currentPin || "Unavailable — set a replacement" }}</strong></span
+			>
 			<button class="term-btn" type="submit">Save crew member</button>
+			<GmLinkTools
+				:link="link(account)"
+				:title="account.name"
+				:account="{ ...account, pin: account.currentPin }"
+				:facility="ship.name"
+			/>
 		</form>
 		<h3>Add crew member</h3>
 		<form class="panel" @submit.prevent="add">

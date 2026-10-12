@@ -1,10 +1,21 @@
 <script setup>
+import GmImageUpload from "./GmImageUpload.vue";
 import GmClearanceSelect from "./GmClearanceSelect.vue";
 import { ref, watch } from "vue";
-const props = defineProps({ ship: Object, images: Array });
+const props = defineProps({ ship: Object, images: Array, tableCode: String });
 const emit = defineEmits(["patch"]);
 const tags = ["public", "crew", "security", "research", "command", "company"];
 const draft = ref(null);
+const uploadTarget = ref("overview");
+const uploadClearance = ref("public");
+const uploading = ref(false);
+function applyUpload(url) {
+	if (uploadTarget.value === "overview") draft.value.overview[uploadClearance.value] = url;
+	else {
+		const deck = draft.value.decks.find((item) => item.id === uploadTarget.value);
+		if (deck) deck.schematics[uploadClearance.value] = url;
+	}
+}
 const roomId = ref("");
 watch(
 	() => props.ship,
@@ -45,7 +56,33 @@ function addRoom() {
 			<option v-for="image in images" :key="image" :value="image" />
 		</datalist>
 		<form @submit.prevent="emit('patch', { blueprints: draft })">
-			<h3>Ship overview</h3>
+			<div class="panel">
+				<h3>Upload deck plan</h3>
+				<div class="gm-fields">
+					<label
+						>Target<select v-model="uploadTarget">
+							<option value="overview">Facility overview</option>
+							<option v-for="deck in draft.decks" :key="deck.id" :value="deck.id">
+								{{ deck.name }}
+							</option>
+						</select></label
+					><label
+						>Clearance layer<select v-model="uploadClearance">
+							<option v-for="tag in tags" :key="tag">{{ tag }}</option>
+						</select></label
+					><label
+						>Image<GmImageUpload
+							:table-code="tableCode"
+							@uploaded="applyUpload"
+							@busy="uploading = $event"
+					/></label>
+				</div>
+				<p class="hint">
+					PNG, JPEG or WebP, up to 2 MB / 16 million pixels. Images are decoded and re-encoded on
+					the server. Save blueprints to apply the uploaded plan.
+				</p>
+			</div>
+			<h3>Facility overview</h3>
 			<div class="gm-fields">
 				<label v-for="tag in tags" :key="tag"
 					>{{ tag }} image<input
@@ -153,7 +190,7 @@ function addRoom() {
 						pattern="[a-z0-9-]{1,64}" /></label
 				><button class="term-btn quiet" type="button" @click="addRoom">Add room</button>
 			</div>
-			<button class="term-btn" type="submit">Save blueprints</button>
+			<button class="term-btn" type="submit" :disabled="uploading">Save blueprints</button>
 		</form>
 	</section>
 </template>
