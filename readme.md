@@ -17,19 +17,27 @@ It listens on `127.0.0.1` and the port in `PORT`. Logs go to stdout. `SIGTERM` c
 
 `BASE_PATH` is the public URL prefix. It must start and end with `/`, for example `/apps/this-tool/`. Leave it unset, empty, or `/` only when running locally at the site root.
 
-`DATA_DIR` is required. Live state is a SQLite file per ship, `$DATA_DIR/<ship>/state.sqlite`, and must sit outside the web root. `dist/` is the terminal the browser loads. `data/<ship>/ship.json` is the scenario shipped with the app (roster, mail, decks, tasks, and the starting status). Old pages and puzzle scripts for a ship stay under that ship's folder and are not served. The plaintext pin list is `gm/<ship>/pins.json` and is not served.
+`DATA_DIR` is required. Live state is one SQLite file, `$DATA_DIR/app.sqlite`, outside the web root. `dist/` is the terminal the browser loads. `data/<ship>/ship.json` is a scenario template. Starting a table copies that template into the database under a 6-character code. Mail, logs, notes, roster status, systems, and announcements for that table then come from the database. A company packet such as Montero is copied into the same table and stays on that table's status. Old pages and puzzle scripts for a ship stay under that ship's folder and are not served. The plaintext pin list is `gm/<ship>/pins.json` and is not served.
 
-A task is a piece of work on that ship. A puzzle is a task with `"kind": "puzzle"`. The terminal lists tasks the clearance can see. It does not run a procedure: until a task names one, the station says none is installed. Cronus has no tasks. Astraeus is `?ship=astraeus`, with its puzzles filed under `data/astraeus/tasks/`.
+A task is a piece of work on that ship. A puzzle is a task with `"kind": "puzzle"`. The terminal lists tasks the clearance can see. It does not run a procedure: until a task names one, the station says none is installed. Cronus has no tasks. Astraeus tasks are filed under `data/astraeus/tasks/`. The GM starts an Astraeus table from `?gm`.
 
-The first request copies roster status, systems, announcements, and logs from the scenario into SQLite. After that, those four are the live copy every terminal reads. Mail, notes, files, rooms, and decks still come from `ship.json`. Set `GM_TOKEN` to change live state:
+With no `?table=` code, the terminal stands by and offers no ship. The GM opens `?gm`, enters `GM_TOKEN`, and starts a table. Players use the URL that desk shows, `?table=` plus the code. Set `GM_TOKEN` before starting tables:
+
+```
+curl -sS -X POST -H "Authorization: Bearer $GM_TOKEN" -H "Content-Type: application/json" \
+  -d "{\"shipId\":\"cronus\"}" \
+  http://127.0.0.1:3000/api/gm/tables
+```
+
+Push a roster change to that table with the code from the response:
 
 ```
 curl -sS -X PATCH -H "Authorization: Bearer $GM_TOKEN" -H "Content-Type: application/json" \
   -d "{\"roster\":{\"c-reynolds\":{\"status\":\"Deceased\"}}}" \
-  http://127.0.0.1:3000/api/ships/cronus/state
+  http://127.0.0.1:3000/api/gm/tables/CODE
 ```
 
-With a prefix, that path is under the prefix too. Terminals pick up the change within about 15 seconds. Login and station notes stay in the browser.
+With a prefix, that path is under the prefix too. Terminals pick up the change within about 5 seconds. Login and which files this station has opened stay in the browser. Station notes are stored on the table.
 
 Local root:
 
@@ -64,9 +72,7 @@ location /apps/this-tool/ {
 # Demo
 https://maciejlisck.github.io/Alien-RPG-Chariot-of-the-Gods-Terminal/src/
 
-The terminal loads a ship file and speaks as that ship's MU/TH/UR. Cronus is the default. Another ship is `?ship=name` (reads `data/<name>/ship.json`) or `?data=https://example.com/ship.json`.
-
-The login screen lists the crew. A card still signs straight in with `?code=` — that URL is what a QR code should encode. Pins are stored as salted SHA-256 hashes. The plaintext list for printing cards is `gm/cronus/pins.json`, which the terminal never loads.
+The terminal stands by until a table code is in the URL. `?table=CODE` loads that table's copy of a scenario. `?gm` is the GM desk. A card still signs straight in with `?table=CODE&code=` — that URL is what a QR code should encode. Pins are stored as salted SHA-256 hashes. The plaintext list for printing cards is `gm/cronus/pins.json`, which the terminal never loads. S. Park's 8-digit company override is in that file too, and it is the same on every Cronus table.
 
 Set `photo` on an account to an image path to show a portrait. `classifiedStatus` is shown only to clearances marked `rosterDetail`. A visitor account uses `external`, `listed: false`, and `restrictTo` for a limited pass.
 

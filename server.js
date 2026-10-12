@@ -6,7 +6,7 @@ const path = require('node:path')
 const fastify = require('fastify')
 const fastifyStatic = require('@fastify/static')
 const pino = require('pino')
-const { createShips } = require('./lib/ships')
+const { createTables } = require('./lib/ships')
 
 const logger = pino({
 	serializers: { req: serializeReq }
@@ -83,7 +83,7 @@ function publicOrigin(request) {
 }
 
 function redactUrl(url) {
-	return String(url || '').replace(/([?&]code=)[^&]*/gi, '$1redacted')
+	return String(url || '').replace(/([?&](?:code|table)=)[^&]*/gi, '$1redacted')
 }
 
 function serializeReq(request) {
@@ -102,10 +102,18 @@ async function main() {
 	const dataDir = readDataDir()
 	const gmToken = readGmToken()
 	const barePrefix = basePath === '/' ? '' : basePath.slice(0, -1)
-	const ships = createShips({
+	const tables = createTables({
 		shipsRoot: path.join(__dirname, 'data'),
 		dataDir: dataDir
 	})
+
+	function gmOnly(request, reply) {
+		if (!gmToken || !authorized(request.headers.authorization, gmToken)) {
+			reply.code(401).send({ error: 'Unauthorized' })
+			return false
+		}
+		return true
+	}
 
 	const app = fastify({
 		loggerInstance: logger,
@@ -126,23 +134,53 @@ async function main() {
 		return reply.code(200).type('application/json; charset=utf-8').send({ ok: true })
 	})
 
-	app.get(basePath + 'api/ships/:shipId/state', async function (request, reply) {
-		const state = ships.state(request.params.shipId)
-		if (!state) return reply.code(404).send({ error: 'Ship not found' })
-		return reply.send(state)
+	app.get(basePath + 'api/tables/:code', async function (request) {
+		return tables.readTable(request.params.code, request.query.ship)
 	})
 
-	app.patch(basePath + 'api/ships/:shipId/state', async function (request, reply) {
-		if (!gmToken || !authorized(request.headers.authorization, gmToken)) {
-			return reply.code(401).send({ error: 'Unauthorized' })
-		}
-		return reply.send(ships.patch(request.params.shipId, request.body))
+	app.get(basePath + 'api/tables/:code/state', async function (request) {
+		return tables.readState(request.params.code, headerFirst(request.headers['x-override-token']), request.query.ship)
 	})
 
-	app.get(basePath + 'api/ships/:shipId', async function (request, reply) {
-		const ship = ships.scenario(request.params.shipId)
-		if (!ship) return reply.code(404).send({ error: 'Ship not found' })
-		return reply.send(ship)
+	app.post(basePath + 'api/tables/:code/messages', async function (request) {
+		return tables.sendMessage(request.params.code, request.body)
+	})
+
+	app.post(basePath + 'api/tables/:code/notes', async function (request) {
+		return tables.saveNote(request.params.code, request.body)
+	})
+
+	app.post(basePath + 'api/tables/:code/override', async function (request) {
+		return tables.unlock(request.params.code, request.body)
+	})
+
+	app.post(basePath + 'api/tables/:code/transfer', async function (request) {
+		return tables.transfer(request.params.code, request.body)
+	})
+
+	app.get(basePath + 'api/gm/scenarios', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.listScenarios()
+	})
+
+	app.get(basePath + 'api/gm/tables', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.listTables()
+	})
+
+	app.post(basePath + 'api/gm/tables', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.createTable(request.body || {})
+	})
+
+	app.get(basePath + 'api/gm/tables/:code', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.gmDetail(request.params.code)
+	})
+
+	app.patch(basePath + 'api/gm/tables/:code', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.patch(request.params.code, request.body)
 	})
 
 	if (barePrefix) {
@@ -176,7 +214,7 @@ async function main() {
 		closing = true
 		app.log.info({ signal }, 'shutting down')
 		try {
-			ships.close()
+			tables.close()
 			await app.close()
 			process.exit(0)
 		} catch (err) {
