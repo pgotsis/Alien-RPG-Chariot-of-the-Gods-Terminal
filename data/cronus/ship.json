@@ -92,7 +92,8 @@
       "status": "Deceased",
       "lastLogin": "03.19.2112",
       "listed": true,
-      "photo": "images/generic/f32.jpg"
+      "photo": "images/generic/f32.jpg",
+      "pinHash": "44d047541a25a948266243eb511555f719d595855099352626d8463ac69d2fc1"
     },
     {
       "id": "ava",
@@ -115,7 +116,8 @@
       "status": "Unaccounted",
       "lastLogin": "03.02.2112",
       "listed": true,
-      "photo": "images/generic/f25.jpg"
+      "photo": "images/generic/f25.jpg",
+      "pinHash": "78a34bdc9da871b28252387773a00fafbe484df85a03901cc8b7d76e721b5b02"
     },
     {
       "id": "m-carter",
@@ -126,7 +128,8 @@
       "status": "Deceased",
       "lastLogin": "03.14.2112",
       "listed": true,
-      "photo": "images/generic/f21.jpg"
+      "photo": "images/generic/f21.jpg",
+      "pinHash": "0b8a667238c552fefba73ac4db7050fd2901ecdd3bc50690caaccf468ad1c31b"
     },
     {
       "id": "l-clayton",
@@ -173,7 +176,8 @@
       "status": "Deceased",
       "lastLogin": "03.16.2112",
       "listed": true,
-      "photo": "images/generic/f10.jpg"
+      "photo": "images/generic/f10.jpg",
+      "pinHash": "3c9ed2fe6e521dcfdc4465d789e7b9cb59ecbc5fe8490560ec6d0f14f5c21b4f"
     },
     {
       "id": "a-johns",
@@ -196,7 +200,8 @@
       "status": "Unaccounted",
       "lastLogin": "03.20.2112",
       "listed": true,
-      "photo": "images/generic/f09.jpg"
+      "photo": "images/generic/f09.jpg",
+      "pinHash": "f00f50398766d303ec45f5d33a1278b4c5714bb2c5f504dd2d31372f21cc08ca"
     },
     {
       "id": "w-marshall",
@@ -207,7 +212,8 @@
       "status": "Unaccounted",
       "lastLogin": "03.17.2112",
       "listed": true,
-      "photo": "images/generic/f12.jpg"
+      "photo": "images/generic/f12.jpg",
+      "pinHash": "0ab1c73bf86d4b1365b72806fd0baefbd409c7e7722593ed583e52660ac28307"
     },
     {
       "id": "a-moreno",
@@ -218,7 +224,8 @@
       "status": "Deceased",
       "lastLogin": "03.17.2112",
       "listed": true,
-      "photo": "images/generic/f15.jpg"
+      "photo": "images/generic/f15.jpg",
+      "pinHash": "345b02377bb635784e466dbb1e2b94bf5dc9a9f67d9134eb90a8798a7ba0bbe6"
     },
     {
       "id": "t-nguyen",
@@ -229,7 +236,8 @@
       "status": "Deceased",
       "lastLogin": "03.16.2112",
       "listed": true,
-      "photo": "images/generic/f29.jpg"
+      "photo": "images/generic/f29.jpg",
+      "pinHash": "cf45b4405fc905edc0301844ba56f7c4f0dad466910f7c1658a5166ec96ec69a"
     },
     {
       "id": "v-reid",
@@ -288,7 +296,8 @@
       "status": "Unaccounted",
       "lastLogin": "03.18.2112",
       "listed": true,
-      "photo": "images/generic/f11.jpg"
+      "photo": "images/generic/f11.jpg",
+      "pinHash": "a1af06f8652165963f6c9bf45418982f7b6f01dc77646ae08e2c22af5fe17282"
     },
     {
       "id": "s-park",

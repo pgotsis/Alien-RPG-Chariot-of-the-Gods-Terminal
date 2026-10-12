@@ -6,6 +6,12 @@ const error = ref("");
 const starts = ref([]);
 const tables = ref([]);
 const detail = ref(null);
+const page = ref("list");
+const catalog = ref([]);
+const createPreset = ref("");
+const createShips = ref([]);
+const createHome = ref("");
+const creating = ref(false);
 const shipId = ref("");
 const logText = ref("");
 const logClearance = ref("crew");
@@ -20,10 +26,10 @@ const moveTo = ref("");
 const loadedComment = ref("");
 let timer = 0;
 
-function headers() {
+function headers(json = false) {
 	return {
 		Authorization: "Bearer " + token.value.trim(),
-		"Content-Type": "application/json"
+		...(json ? { "Content-Type": "application/json" } : {})
 	};
 }
 
@@ -70,6 +76,7 @@ async function loadLists() {
 	}
 	const scenarios = await scenarioResponse.json();
 	starts.value = scenarios.starts || [];
+	catalog.value = scenarios.ships || [];
 	tables.value = await tableResponse.json();
 }
 
@@ -78,20 +85,47 @@ function saveToken() {
 	loadLists().catch(function () { error.value = "The GM desk could not be loaded."; });
 }
 
-async function startTable(id) {
+function backToTables() {
+	page.value = "list";
+	detail.value = null;
 	error.value = "";
-	const response = await fetch("api/gm/tables", {
-		method: "POST",
-		headers: headers(),
-		body: JSON.stringify({ scenario: id })
-	});
-	if (!response.ok) {
-		error.value = "The table could not be started.";
-		return;
-	}
-	const created = await response.json();
-	await loadLists();
-	await openTable(created.code);
+	loadLists().catch(function () { error.value = "The GM desk could not be loaded."; });
+}
+
+function chooseScenario(id) {
+	createPreset.value = id || "";
+	const scenario = starts.value.find((item) => item.id === id);
+	createShips.value = scenario ? scenario.ships.slice() : [];
+	createHome.value = scenario ? scenario.home : "";
+}
+
+function showCreate() {
+	detail.value = null;
+	error.value = "";
+	chooseScenario(starts.value[0] && starts.value[0].id);
+	page.value = "create";
+}
+
+function configureShip(id, on) {
+	createShips.value = on ? [...new Set(createShips.value.concat(id))] : createShips.value.filter((ship) => ship !== id);
+	if (!createShips.value.includes(createHome.value)) createHome.value = createShips.value[0] || "";
+}
+
+async function createTable() {
+	if (creating.value || !createShips.value.length) return;
+	creating.value = true;
+	error.value = "";
+	try {
+		const response = await fetch("api/gm/tables", {
+			method: "POST",
+			headers: headers(true),
+			body: JSON.stringify({ ships: createShips.value, home: createHome.value })
+		});
+		if (!response.ok) { error.value = "The table could not be created."; return; }
+		const created = await response.json();
+		await openTable(created.code);
+	} catch { error.value = "The table could not be created."; }
+	finally { creating.value = false; }
 }
 
 function syncShip() {
@@ -115,6 +149,7 @@ async function openTable(code) {
 		return;
 	}
 	detail.value = await response.json();
+	page.value = "detail";
 	loadedComment.value = detail.value.comment || "";
 	syncShip();
 	await loadLists();
@@ -146,7 +181,7 @@ async function patch(body) {
 	error.value = "";
 	const response = await fetch("api/gm/tables/" + encodeURIComponent(detail.value.code), {
 		method: "PATCH",
-		headers: headers(),
+		headers: headers(true),
 		body: JSON.stringify(Object.assign({ shipId: shipId.value }, body))
 	});
 	if (!response.ok) {
@@ -217,9 +252,7 @@ function addSystem() {
 	});
 }
 
-async function deleteTable() {
-	if (!detail.value) return;
-	const code = detail.value.code;
+async function deleteTable(code) {
 	const sure = window.confirm("Delete table " + code + "? This cannot be undone.");
 	if (!sure) return;
 	error.value = "";
@@ -231,8 +264,11 @@ async function deleteTable() {
 		error.value = "That table could not be deleted.";
 		return;
 	}
-	detail.value = null;
-	loadedComment.value = "";
+	if (detail.value && detail.value.code === code) {
+		detail.value = null;
+		loadedComment.value = "";
+		page.value = "list";
+	}
 	await loadLists();
 }
 
@@ -329,7 +365,7 @@ onUnmounted(function () {
 <template>
 	<div class="gm">
 		<h1>GM desk</h1>
-		<p class="hint">Start a table, then give the players that table's URL. Each ship on the table has its own MU/TH/UR.</p>
+		<p class="hint">Create a table, then give the players that table's URL. Each ship on the table has its own MU/TH/UR.</p>
 		<label class="gm-token">
 			GM token
 			<input v-model="token" type="password" autocomplete="off" />
@@ -337,48 +373,67 @@ onUnmounted(function () {
 		<button class="term-btn" type="button" @click="saveToken">Open desk</button>
 		<p v-if="error" class="error">{{ error }}</p>
 
-		<h2>Start</h2>
-		<div class="actions">
-			<button
-				v-for="scenario in starts"
-				:key="scenario.id"
-				class="term-btn"
-				type="button"
-				@click="startTable(scenario.id)"
-			>Start {{ scenario.name }}</button>
-		</div>
+		<template v-if="page === 'create'">
+			<button class="term-btn quiet" type="button" @click="backToTables">Back to tables</button>
+			<h2>Create table</h2>
+			<form @submit.prevent="createTable">
+				<label>Scenario preset
+					<select :value="createPreset" @change="chooseScenario($event.target.value)">
+						<option value="" disabled>Choose a preset</option>
+						<option v-for="scenario in starts" :key="scenario.id" :value="scenario.id">{{ scenario.name }}</option>
+					</select>
+				</label>
+				<h3>Ships on this table</h3>
+				<div v-for="ship in catalog" :key="ship.id" class="gm-row">
+					<label><input type="checkbox" :checked="createShips.includes(ship.id)" @change="configureShip(ship.id, $event.target.checked)" /> {{ ship.name }}</label>
+				</div>
+				<label>Home computer
+					<select v-model="createHome" :disabled="!createShips.length">
+						<option v-for="ship in catalog.filter((item) => createShips.includes(item.id))" :key="ship.id" :value="ship.id">{{ ship.name }}</option>
+					</select>
+				</label>
+				<p class="hint">Players start on the home computer. Configure player access and roster after creation.</p>
+				<button class="term-btn" type="submit" :disabled="creating || !createShips.length">{{ creating ? "Creating…" : "Create table" }}</button>
+			</form>
+		</template>
 
-		<h2>Tables</h2>
-		<table v-if="tables.length" class="gm-table">
-			<thead>
-				<tr>
-					<th>Table</th>
-					<th>Ships</th>
-					<th>Added</th>
-					<th>Comment</th>
-					<th>Created</th>
-					<th>Player</th>
-					<th>GM</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="table in tables" :key="table.code">
-					<td>
-						<button class="term-btn" :class="{ on: detail && detail.code === table.code }" type="button" @click="openTable(table.code)">{{ table.code }}</button>
-						<div><a :href="playerUrl(table.code)">Player link</a></div>
-					</td>
-					<td>{{ table.name }}</td>
-					<td>{{ addedText(table.added) }}</td>
-					<td>{{ table.comment || "—" }}</td>
-					<td>{{ when(table.createdAt) }}</td>
-					<td>{{ when(table.playerSeenAt) }}</td>
-					<td>{{ when(table.gmSeenAt) }}</td>
-				</tr>
-			</tbody>
-		</table>
-		<p v-else class="hint">No tables yet.</p>
+		<template v-if="page === 'list'">
+			<button class="term-btn" type="button" :disabled="!starts.length" @click="showCreate">Create table</button>
+			<h2>Tables</h2>
+			<table v-if="tables.length" class="gm-table">
+				<thead>
+					<tr>
+						<th>Table</th>
+						<th>Ships</th>
+						<th>Added</th>
+						<th>Comment</th>
+						<th>Created</th>
+						<th>Player</th>
+						<th>GM</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="table in tables" :key="table.code">
+						<td>
+							<button class="term-btn" :class="{ on: detail && detail.code === table.code }" type="button" @click="openTable(table.code)">{{ table.code }}</button>
+							<div><a :href="playerUrl(table.code)">Player link</a></div>
+						</td>
+						<td>{{ table.name }}</td>
+						<td>{{ addedText(table.added) }}</td>
+						<td>{{ table.comment || "—" }}</td>
+						<td>{{ when(table.createdAt) }}</td>
+						<td>{{ when(table.playerSeenAt) }}</td>
+						<td>{{ when(table.gmSeenAt) }}</td>
+						<td><button class="term-btn quiet" type="button" @click="deleteTable(table.code)">Delete table</button></td>
+					</tr>
+				</tbody>
+			</table>
+			<p v-else class="hint">No tables yet.</p>
+		</template>
 
-		<template v-if="detail">
+		<template v-if="page === 'detail' && detail">
+			<button class="term-btn quiet" type="button" @click="backToTables">Back to tables</button>
 			<h2>{{ detail.name }}  {{ detail.code }}</h2>
 			<p class="hint">Players start on the home computer. Close a computer when that ship is lost. Other computers stay closed until you open them.</p>
 			<p class="player-url"><a :href="playerUrl(detail.code)">{{ playerUrl(detail.code) }}</a></p>
@@ -389,7 +444,7 @@ onUnmounted(function () {
 				<textarea v-model="detail.comment" class="scratch" data-field="comment"></textarea>
 			</label>
 			<button class="term-btn" type="button" @click="saveComment">Save comment</button>
-			<button class="term-btn quiet" type="button" @click="deleteTable">Delete table</button>
+			<button class="term-btn quiet" type="button" @click="deleteTable(detail.code)">Delete table</button>
 
 			<h2>Ships on this table</h2>
 			<div v-for="ship in detail.catalog" :key="ship.id" class="gm-row">
