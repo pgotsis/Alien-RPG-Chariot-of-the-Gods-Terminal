@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue";
+import GmLinkTools from "./GmLinkTools.vue";
 import GmTableEditor from "./GmTableEditor.vue";
 
 const token = ref(sessionStorage.getItem("muthr-gm-token") || "");
@@ -153,6 +154,7 @@ async function refreshDetail() {
 	if (!response.ok) return;
 	const next = await response.json();
 	if (!detail.value || detail.value.code !== next.code) return;
+	detail.value.currentDate = next.currentDate;
 	detail.value.messages = next.messages;
 	for (const ship of detail.value.ships) {
 		const fresh = next.ships.find(item => item.id === ship.id);
@@ -272,7 +274,7 @@ onUnmounted(function () {
 					<tr v-for="table in tables" :key="table.code">
 						<td>
 							<button class="term-btn" :class="{ on: detail && detail.code === table.code }" type="button" @click="openTable(table.code)">{{ table.code }}</button>
-							<div><a :href="playerUrl(table.code)">Player link</a></div>
+							<div><a :href="playerUrl(table.code)">Campaign link</a> <GmLinkTools :link="playerUrl(table.code)" :title="'Campaign ' + table.code" /></div>
 						</td>
 						<td>{{ table.name }}</td>
 						<td>{{ addedText(table.added) }}</td>

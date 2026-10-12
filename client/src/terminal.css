@@ -484,3 +484,31 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 	.gm-sidebar .term-btn { white-space: normal; }
 }
 .terminal:has(> .gm) { max-width: 1440px; }
+.gm-link-tools { display: inline-flex; gap: 0.3rem; align-items: center; }
+.gm-pin-display { white-space: nowrap; font-size: 0.8rem; }
+.qr-modal { max-width: min(92vw, 42rem); border: 2px solid var(--AGreen); padding: 1rem; color: var(--AWhite); background: var(--ABlack); }
+.qr-modal::backdrop { background: rgba(0, 0, 0, 0.8); }
+.qr-display svg { display: block; width: min(70vw, 24rem); margin: auto; }
+.qr-display a { display: block; overflow-wrap: anywhere; color: var(--AGreen); margin-block: 0.75rem; }
+.qr-note { font-size: 0.8rem; }
+.crew-badge { width: 86mm; min-height: 54mm; padding: 3mm; background: white; color: #151515; border: 1px solid #888; font: 9pt Arial, sans-serif; }
+.crew-badge header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 2mm; font-size: 7pt; }
+.crew-badge header img { width: 25mm; max-height: 10mm; object-fit: contain; }
+.badge-main { display: flex; gap: 2mm; align-items: center; margin-block: 2mm; }
+.badge-main > div { flex: 1; min-width: 0; }
+.badge-main h2 { font-size: 10pt; margin: 0 0 1mm; color: black; }
+.badge-main p { margin: 1mm 0; font-size: 8pt; }
+.badge-photo { width: 18mm; height: 24mm; object-fit: cover; }
+.badge-qr { width: 25mm; height: 25mm; flex-shrink: 0; }
+.badge-qr svg { width: 100%; height: 100%; }
+.crew-badge footer { display: flex; align-items: center; justify-content: space-between; gap: 2mm; border-top: 1px solid #555; padding-top: 1mm; font-size: 6pt; }
+.badge-pin { font: bold 14pt monospace; letter-spacing: 1mm; color: #777; mask-image: repeating-linear-gradient(0deg, transparent 0 1px, black 1px 3px); }
+@media print {
+ body > * { display: none !important; }
+ body > .qr-modal[open] { display: block !important; position: static; border: 0; padding: 0; width: auto; max-width: none; background: white; }
+ .qr-modal .actions, .qr-modal .qr-note { display: none !important; }
+ .crew-badge { break-inside: avoid; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+.gm-crew-card .gm-company-override { flex-basis: 100%; grid-template-columns: minmax(8rem, 1fr) minmax(12rem, 2fr); }
+.gm-company-override .hint { grid-column: 1 / -1; }
+@media (max-width: 640px) { .gm-crew-card .gm-company-override { grid-template-columns: 1fr; } }

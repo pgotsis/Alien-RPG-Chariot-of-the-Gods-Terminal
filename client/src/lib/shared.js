@@ -2,6 +2,7 @@
 function applySharedState(ship, shared) {
 	if (!ship || !shared) return ship;
 	if (Array.isArray(shared.accounts)) ship.accounts = shared.accounts;
+	for (const field of ["date", "name", "computer"]) if (shared[field] != null) ship[field] = shared[field];
 	const roster = shared.roster || {};
 	(ship.accounts || []).forEach(function (account) {
 		const row = roster[account.id];

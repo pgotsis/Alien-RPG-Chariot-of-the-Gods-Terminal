@@ -79,7 +79,8 @@ test('table-specific roster and PIN changes persist and reach login state withou
 	const gm = f.tables.gmDetail(code).ships[0].accounts[0]
 	assert.equal(gm.hasPin, true)
 	assert.equal(gm.pinHash, undefined)
-	assert.equal(gm.pin, undefined)
+	assert.equal(gm.pin, '983621')
+	assert.equal(f.tables.readTable(code).ship.accounts[0].pinSecret, undefined)
 	assert.throws(
 		() => f.tables.patch(code, { updateCrew: { id: 'm-davis', pin: '983621' } }),
 		/already assigned/,
@@ -298,17 +299,23 @@ test('scenario defaults contain no Park account, credentials or records, and Cro
 	}
 })
 
-test('star map backgrounds persist, sync to players, can be cleared, and reject invalid image data', (t) => {
+test('star map backgrounds persist, sync to players, can be cleared, and reject invalid image data', async (t) => {
 	const f = fixture(t)
 	const { code } = f.tables.createTable('montero')
 	const map = f.tables.gmDetail(code).ships[0].starMap
-	const png =
-		'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='
+	const raster = await require('sharp')({
+		create: { width: 2, height: 2, channels: 3, background: '#000' },
+	})
+		.png()
+		.toBuffer()
+	const uploaded = (
+		await f.tables.uploadImage(code, 'data:image/png;base64,' + raster.toString('base64'))
+	).url
 	f.tables.patch(code, {
-		starMap: { ...map, background: png, backgroundOpacity: 0.5, backgroundFit: 'cover' },
+		starMap: { ...map, background: uploaded, backgroundOpacity: 0.5, backgroundFit: 'cover' },
 	})
 	f.restart()
-	assert.equal(f.tables.readState(code).starMap.background, png)
+	assert.equal(f.tables.readState(code).starMap.background, uploaded)
 	assert.equal(f.tables.readState(code).starMap.backgroundOpacity, 0.5)
 	assert.equal(f.tables.gmDetail(code).ships[0].starMap.backgroundFit, 'cover')
 	for (const background of [

@@ -154,10 +154,18 @@ async function main() {
 		return tables.unlock(request.params.code, request.body)
 	})
 
-	app.post(basePath + 'api/tables/:code/transfer', async function (request) {
+	app.post(basePath + 'api/tables/:code/transfer', async function (request, reply) {
+		if (!gmOnly(request, reply)) return
 		return tables.transfer(request.params.code, request.body)
 	})
 
+	app.post(basePath + 'api/gm/tables/:code/images', { bodyLimit: 3 * 1024 * 1024, onRequest: async function (request, reply) { if (!gmOnly(request, reply)) return reply } }, async function (request, reply) {
+		if (!gmOnly(request, reply)) return
+		return tables.uploadImage(request.params.code, request.body && request.body.image)
+	})
+	app.get(basePath + 'api/tables/:code/images/:id', async function (request, reply) {
+		return reply.header('X-Content-Type-Options', 'nosniff').header('Content-Security-Policy', "default-src 'none'; sandbox").header('Cache-Control', 'private, max-age=86400').type('image/webp').send(tables.readImage(request.params.code, request.params.id))
+	})
 	app.get(basePath + 'api/gm/scenarios', async function (request, reply) {
 		if (!gmOnly(request, reply)) return
 		return tables.listScenarios()

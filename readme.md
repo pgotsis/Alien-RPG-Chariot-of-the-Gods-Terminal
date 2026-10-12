@@ -25,14 +25,14 @@ The comparison below uses upstream [`main` at `fff6cf5`](https://github.com/Maci
 - Added six-character table codes and player links that select a specific group's copy of the scenario.
 - Added scenario templates for Cronus, Montero and Astraeus, plus a Chariot of the Gods preset containing Montero and Cronus. Each ship has its own computer, roster and records.
 - Added a configurable home ship, ship membership and individual player-access controls. Other ships can remain closed until the GM opens them.
-- Added player switching between open ship computers and transfer of personal mail and station notes between ships. Ship systems, logs and blueprints remain with their ship.
+- Added player switching between open facility computers and GM-only crew registration at other facilities. Personal mail and notes are stored once per table and available wherever the person is registered; facility systems, broadcasts, logs, blueprints and ship files remain local. Existing personal records are migrated to shared storage.
 - Added automatic polling, approximately every five seconds, to distribute changes and notify stations of updated sections. Table state survives server restarts; station login and viewed-item state remain in the browser.
 
 ### Personnel, access cards and mail
 
 - Added PINs for all 18 listed Cronus crew and all five Montero crew, including people without existing mail or other personal content.
 - Set Montero's default roster status to Aboard and its titles to Captain, Pilot, Technician, Cargo Handler and Corporate Liaison.
-- Added salted SHA-256 PIN hashes and separate GM PIN-reference files. Table-specific PIN overrides replace an account's previous code without rewriting scenario defaults.
+- Added salted SHA-256 PIN hashes and separate GM PIN-reference files. Table-specific overrides replace previous codes without rewriting defaults. New overrides are also encrypted so the authenticated GM can display them and generate crew credentials; player responses exclude recoverable PINs.
 - Added editable crew names, titles, statuses and clearances, status dropdowns, and creation of additional crew members with PINs and a choice of unused portraits.
 - Added live roster and PIN updates on the login screen. Personnel status is omitted from the login rolodex while remaining available in the personnel views according to clearance.
 - Added data-driven clearance inheritance, module grants, restricted visitor accounts, clearance-specific descriptions and classified roster details.
@@ -42,7 +42,7 @@ The comparison below uses upstream [`main` at `fff6cf5`](https://github.com/Maci
 
 - Added a GM-token-protected desk, table list, create-table configuration view, table deletion from the list, and a separate table-editing view.
 - Added a vertical section sidebar and ship-name selectors for the table editor.
-- Added table comments, ship/access management, crew and PIN editing, and personal-data transfer controls.
+- Added table comments, an editable campaign clock, facility/access management, crew and PIN editing, and GM-only crew registration controls. Facilities support Ship, Base, Space Station and Offices types, with editable names, AI names and versions.
 - Added system creation, editing and removal, with compact fields for state, visibility and severity. Suggested names populate scenario-specific or common ship-system presets, including state choices and adventure descriptions.
 - Added editors for every existing scenario log, announcement and mail entry, alongside new entries. Dates, text and visibility can be changed, and entries can be removed.
 - Separated public announcements from mail. Public/crew broadcasts and announcement clearance determine which transmissions appear in the terminal's corresponding views.
@@ -52,7 +52,7 @@ The comparison below uses upstream [`main` at `fff6cf5`](https://github.com/Maci
 
 - Added table-specific blueprint editing: overview and deck image layers by clearance, deck names and dimensions, room hotspots, room descriptions and access requirements.
 - Added selection of bundled blueprint images or HTTPS image URLs while retaining the original interactive deck-map material.
-- Added a command/company Star map with an editable ship position, named waypoints, dates and navigation notes. It uses a schematic coordinate grid; the position remains unconfirmed until the GM enters it. Existing visitor restrictions still apply.
+- Added a command/company Star map with a location dropdown, scenario defaults, editable waypoints, dates, navigation notes and background images. It uses a schematic coordinate grid; coordinates and presets are story aids rather than astronomical measurements. Existing visitor restrictions still apply.
 - Organized scenario content into ship templates, clearance-aware files, logs, notes and tasks. Retained legacy Astraeus media and puzzle scripts as scenario material; the current terminal lists tasks but does not execute those legacy procedures.
 
 ### Running, deployment and validation
@@ -81,7 +81,7 @@ It listens on `127.0.0.1` and the port in `PORT`. Logs go to stdout. `SIGTERM` c
 
 `BASE_PATH` is the public URL prefix. It must start and end with `/`, for example `/apps/this-tool/`. Leave it unset, empty, or `/` only when running locally at the site root.
 
-`DATA_DIR` is required. Live state is one SQLite file, `$DATA_DIR/app.sqlite`, outside the web root. `dist/` is the terminal the browser loads. `data/<ship>/ship.json` is a scenario template. Starting a table copies that template into the database under a 6-character code. Mail, logs, notes, roster status, systems, and announcements for that table then come from the database. A company packet such as Montero is copied into the same table and stays on that table's status. Old pages and puzzle scripts for a ship stay under that ship's folder and are not served. The plaintext pin list is `gm/<ship>/pins.json` and is not served.
+`DATA_DIR` is required. Live state is one SQLite file, `$DATA_DIR/app.sqlite`, outside the web root. `dist/` is the terminal the browser loads. `data/<ship>/ship.json` is a scenario template. Starting a table copies that template into the database under a 6-character code. Mail, logs, notes, roster status, systems, and announcements for that table then come from the database. Old pages and puzzle scripts for a ship stay under that ship's folder and are not served. The plaintext pin list is `gm/<ship>/pins.json` and is not served.
 
 A task is a piece of work on that ship. A puzzle is a task with `"kind": "puzzle"`. The terminal lists tasks the clearance can see. It does not run a procedure: until a task names one, the station says none is installed. Cronus has no tasks. Astraeus tasks are filed under `data/astraeus/tasks/`. The GM starts an Astraeus table from `?gm`.
 
@@ -135,15 +135,23 @@ location /apps/this-tool/ {
 
 # GM table editor
 
-The GM desk has a table list and a separate editor with a section sidebar. Select ships by name. Roster changes (name, title, status, clearance and PIN), new crew and portraits are saved on that table. PIN overrides replace the previous access code; only salted hashes are stored. Defaults for printing cards are in `gm/<ship>/pins.json`; table-specific overrides do not rewrite those template files. Players receive roster, blueprint and navigation changes on the next refresh, including while on the login screen.
+The GM desk has a table list and a separate editor with a section sidebar. Select ships by name. Roster changes (name, title, status, clearance and PIN), new crew and portraits are saved on that table. PIN overrides replace the previous access code. Login checks use salted hashes; new overrides are additionally stored with AES-256-GCM encryption for GM-only retrieval. Default PINs come from the GM reference files. The original Cronus PINs from the upstream README are preserved in `gm/cronus/pins.json` and displayed by the GM roster when they match the account hash. Only a later custom PIN that was stored solely as a hash, differs from the known defaults, and was not recorded elsewhere requires a replacement. Defaults for printing cards are in `gm/<ship>/pins.json`; table-specific overrides do not rewrite those template files. Players receive roster, blueprint and navigation changes on the next refresh, including while on the login screen.
 
 Systems offer adventure presets, editable state choices, severity, visibility and clearance-specific descriptions. Logs, announcements and mail include the original scenario entries and can be edited, added or removed with an adventure date. Announcements and mail are separate: public announcements require `public` visibility; crew/public mail recipients are broadcasts.
 
-Blueprints allow image layers per clearance, deck dimensions, room hotspots and room descriptions. Choose an existing image or an HTTPS image URL. The command/company Star map is a schematic navigation grid with editable ship position and waypoints, not an astronomical chart. Its position starts unconfirmed until the GM sets it. The GM can set a background using an HTTPS image URL or upload a PNG, JPEG or WebP image up to 2 MB, then adjust its fit and opacity. Uploaded backgrounds are stored with the table.
+Blueprints allow image layers per clearance, deck dimensions, room hotspots and room descriptions. Choose an existing image or an HTTPS image URL. The command/company Star map is a schematic navigation grid with editable ship position and waypoints, not an astronomical chart. Location presets include the adventure systems and destinations, with sensible scenario defaults. The GM can set a background using an HTTPS image URL or upload a PNG, JPEG or WebP image up to 2 MB, then adjust its fit and opacity. Background and deck-plan uploads are decoded and re-encoded to WebP on the server, stripping metadata. Uploads are limited to 2 MB, 16 million pixels and dimensions up to 8192 pixels; SVG, animated and executable formats are rejected. Stored images use opaque names outside the web root and a dedicated image-only route with security headers. Uploads require GM authentication and are rate/concurrency limited. HTTPS image URLs are loaded by the browser; the server does not fetch them.
 
 Prepared events save transmissions, dated log entries, system changes and roster changes ahead of play. Saving does not send anything. **Push event** applies all changes in one transaction; a rejected change leaves the event unapplied. Events remain available for editing and reuse, and show when they were last pushed. Pushing a transmission again creates another entry.
 
-All table edits and prepared events persist in `DATA_DIR/app.sqlite`. New tables use the current scenario defaults; existing table statuses are preserved. Run `npm test` for the GM persistence and editing checks.
+The table settings clock starts at the current date, advances in real time and can be set manually or jumped forward by 5/30 minutes or 1/2/3/5 hours. Campaign times use UTC. Changing the clock updates terminal banners without changing existing record dates.
+
+The GM roster displays known PINs and provides crew-login QR codes and printable white personnel badges, with portrait, name, title, clearance and a striped PIN. Campaign QR codes are also available in the table list and settings. Crew links contain the PIN and grant that person's access to whoever holds the code; the printed pattern is visual obscurity, not encryption. QR generation runs locally without a third-party service.
+
+**Company override** is separate from registration. Each company-level account receives an eight-digit override code, with a GM-editable target AI at another facility on the same table. The GM can see and replace the code in the roster. A company override exposes facility systems, logs, blueprints and navigation at company clearance, plus explicitly public mail, notes and files. It does not register the person, merge their personal records into the remote AI, or expose private personal data. Override codes are encrypted for GM retrieval; changing the code, target or clearance revokes the prior remote session. A table with only one facility has no remote target until another facility is added.
+
+**Crew registration** is GM-only. Registering someone at another facility grants access to that AI terminal while retaining the original registration. Mail and personal notes share one table-wide record and synchronize across registered facilities; there is no player move/copy action. Existing duplicate historical copies with different content are preserved during migration. Ship files remain local because the current file model represents facility records, not personal attachments.
+
+All table edits and prepared events persist in `DATA_DIR/app.sqlite`. Back up the entire data directory, including `gm-pin.key` and `uploads/`, along with the database; losing the encryption key prevents recovery of saved override PINs. New tables use the current scenario defaults; existing table statuses are preserved. Run `npm test` for the GM persistence and editing checks.
 
 # Languages
 
