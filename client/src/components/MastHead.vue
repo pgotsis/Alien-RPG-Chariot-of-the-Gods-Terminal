@@ -1,5 +1,6 @@
 <script setup>
 import { computed, inject } from "vue";
+import AvatarMark from "./AvatarMark.vue";
 import { accessLabel } from "../lib/access.js";
 
 const terminal = inject("terminal");
@@ -8,6 +9,16 @@ const props = defineProps({
 });
 
 const ship = computed(() => terminal.state.ship || {});
+
+const mark = computed(function () {
+	const name = String(ship.value.name || "Terminal").replace(/^USCSS\s+/i, "").trim();
+	return name.toUpperCase();
+});
+
+const markSize = computed(function () {
+	const length = Math.max(mark.value.length, 1);
+	return Math.min(2.45, 16 / length) + "rem";
+});
 
 const label = computed(() => (props.chip && terminal.state.account ? accessLabel(terminal.state.account) : ""));
 
@@ -25,18 +36,23 @@ const accessColor = computed(function () {
 
 <template>
 	<div class="mast">
-		<div>
-			<h1>{{ ship.computer || "MU/TH/UR" }}</h1>
-			<p class="subhead">
-				{{ ship.name || "Ship terminal" }}<template v-if="ship.date">  ·  {{ ship.date }}</template>
-			</p>
-		</div>
-		<img v-if="ship.logo && !chip" class="wordmark" alt="" :src="ship.logo" />
-		<div v-if="chip && terminal.state.account" class="userchip" :style="{ '--access': accessColor }">
-			<strong>{{ terminal.state.account.name }}</strong>
-			<span>{{ terminal.state.account.job || "" }}</span>
-			<span>Access: {{ label }}</span>
-			<span v-if="terminal.state.account.homeShip">{{ terminal.state.account.homeShip }}</span>
+		<div class="mast-top">
+			<div>
+				<h1>{{ ship.computer || "MU/TH/UR" }}</h1>
+				<p class="subhead">
+					{{ ship.name || "Ship terminal" }}<template v-if="ship.date">  ·  {{ ship.date }}</template>
+				</p>
+			</div>
+			<p v-if="!chip" class="wordmark" :style="{ '--mark': markSize }" aria-hidden="true">{{ mark }}</p>
+			<div v-if="chip && terminal.state.account" class="userchip" :style="{ '--access': accessColor }">
+				<AvatarMark :account="terminal.state.account" />
+				<div>
+					<strong>{{ terminal.state.account.name }}</strong>
+					<span>{{ terminal.state.account.job || "" }}</span>
+					<span>Access: {{ label }}</span>
+					<span v-if="terminal.state.account.homeShip">{{ terminal.state.account.homeShip }}</span>
+				</div>
+			</div>
 		</div>
 		<div v-if="(terminal.state.ships || []).length > 1" class="computer-row">
 			<button

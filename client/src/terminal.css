@@ -1,3 +1,11 @@
+@font-face {
+	font-family: "Russo One";
+	src: url("./fonts/RussoOne-latin.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
 :root {
 	--ABlack: #0e100b;
 	--AWhite: #dcf0e1;
@@ -51,11 +59,16 @@ button, input, textarea {
 
 .mast {
 	display: flex;
-	justify-content: space-between;
+	flex-direction: column;
 	gap: 1rem;
-	align-items: flex-start;
 	margin-bottom: 1.25rem;
-	flex-wrap: wrap;
+}
+
+.mast-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
 }
 
 .mast h1, .screen h2, .panel h3 {
@@ -77,13 +90,25 @@ button, input, textarea {
 }
 
 .wordmark {
-	height: 42px;
-	width: auto;
-	max-width: 46%;
-	object-fit: contain;
+	margin: 0 0 0 auto;
+	max-width: 58%;
+	text-align: right;
+	font-family: "Russo One", Impact, "Arial Narrow", sans-serif;
+	font-weight: 400;
+	font-size: var(--mark, 2.4rem);
+	line-height: 0.85;
+	letter-spacing: 0.04em;
+	color: #050705;
+	-webkit-text-stroke: 0.045em var(--AGreen);
+	paint-order: stroke fill;
+	text-shadow: 0 0 10px rgba(22, 250, 75, 0.55);
+	white-space: nowrap;
 }
 
 .userchip {
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
 	border: 2px solid var(--access, var(--AGreen));
 	box-shadow: 0 0 12px var(--access, var(--AGreen));
 	padding: 0.45rem 0.7rem;
@@ -224,7 +249,7 @@ button, input, textarea {
 	vertical-align: top;
 }
 .gm-table a { color: var(--AGreen); }
-.computer-row { flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.computer-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .computer-row small { display: block; opacity: 0.8; }
 
 .announce {
@@ -341,9 +366,7 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 
 @media (max-width: 800px) {
 	.split, .map-layout { grid-template-columns: 1fr; }
-	.mast { flex-direction: column; }
-	.wordmark { max-width: 70%; }
-	.userchip { width: 100%; }
+	.userchip { width: auto; max-width: 100%; }
 }
 
 @media (max-width: 640px) {
@@ -359,5 +382,5 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 	.folder-row .term-btn, .deck-row .term-btn, .actions .term-btn { flex: 1 1 calc(50% - 0.6rem); }
 	.code-row { flex-direction: column; }
 	.pin-dots { letter-spacing: 0.2rem; }
-	.wordmark { height: 36px; }
+	.wordmark { font-size: calc(var(--mark, 2.4rem) * 0.72); }
 }
