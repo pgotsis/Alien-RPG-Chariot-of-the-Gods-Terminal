@@ -2,6 +2,13 @@
   "ship": "montero",
   "salt": "uscss-montero-v1",
   "pins": {
-    "public": ["1111"]
+    "public": [
+      "1111"
+    ],
+    "m-miller": "4826",
+    "m-davis": "5937",
+    "k-rye": "6048",
+    "l-cham": "7159",
+    "j-wilson": "8260"
   }
 }

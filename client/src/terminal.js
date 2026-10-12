@@ -310,11 +310,18 @@ export function createTerminal() {
 				if (!(shared.shipId && state.ship && shared.shipId !== state.ship.id)) {
 					if (Array.isArray(shared.ships)) state.ships = shared.ships;
 					if (shared.homeShip) state.homeShip = shared.homeShip;
+					if (shared.date) state.ship.date = shared.date;
 					const same = shared.revision === state.revision;
 					state.revision = shared.revision;
 					state.pulses = shared.pulses || [];
-					if (!same) applySharedState(state.ship, shared);
-					if (state.session.overrideToken && shared.packet) state.packet = shared.packet;
+					if (!same) {
+						applySharedState(state.ship, shared);
+						if (state.account) {
+							state.account = accountById(state.ship, state.account.id) || state.account;
+							state.grants = grantsFor(state.ship, state.account);
+						}
+					}
+					if (state.session.overrideToken) state.packet = shared.packet || null;
 				}
 			}
 		} finally {
@@ -513,30 +520,6 @@ export function createTerminal() {
 		await applyComputer(await response.json());
 	}
 
-	async function transferPersonal(toShipId) {
-		const other = (state.ships || []).find(function (ship) { return ship.id === toShipId; });
-		if (!other || !state.account || state.account.id === "public" || !state.ship) return;
-		const sure = window.confirm(
-			"Move your personal mail and station notes to " + other.name + "? Schematics, logs, and ship status stay on this computer."
-		);
-		if (!sure) return;
-		const response = await fetch("api/tables/" + encodeURIComponent(state.tableCode) + "/transfer", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				accountId: state.account.id,
-				fromShip: state.ship.id,
-				toShip: toShipId
-			})
-		});
-		if (!response.ok) {
-			play("accessdenied.mp3");
-			return;
-		}
-		await pullShared();
-		play("keyok1.mp3");
-	}
-
 	function start() {
 		boot();
 		timer = window.setInterval(pullShared, 5000);
@@ -570,7 +553,6 @@ export function createTerminal() {
 		saveStationNote,
 		submitOverride,
 		connectShip,
-		transferPersonal,
 		start,
 		stop
 	};

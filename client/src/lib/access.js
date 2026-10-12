@@ -51,6 +51,8 @@ function mergeGrants(ship, tags) {
 function grantsFor(ship, account) {
 	const tags = expandClearance(ship, account.clearance || []);
 	const grants = mergeGrants(ship, tags);
+	if (tags.includes("command") || tags.includes("company")) grants.modules.push("starmap");
+	if ((ship.decks || []).length && tags.includes("crew") && !grants.modules.includes("map")) grants.modules.push("map");
 	const limit = account.restrictTo;
 	if (limit) {
 		if (limit.modules) grants.modules = grants.modules.filter(function (id) { return limit.modules.indexOf(id) !== -1; });
