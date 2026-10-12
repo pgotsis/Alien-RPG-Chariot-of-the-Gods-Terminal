@@ -1,8 +1,8 @@
 <script setup>
+import GmClearanceSelect from "./GmClearanceSelect.vue";
 import { computed, ref, watch } from "vue";
 const props = defineProps({ kind: String, entries: Array, ship: Object });
 const emit = defineEmits(["patch"]);
-const clearances = ["public", "crew", "security", "research", "command", "company"];
 const labels = { Log: "Logs", Announcement: "Announcements", Mail: "Mail" };
 const rows = ref([]);
 const blank = () => ({
@@ -91,11 +91,7 @@ function remove(item) {
 				<label
 					>Date and time<input v-model="item.time" placeholder="2183-11-12 14:30" maxlength="200"
 				/></label>
-				<label
-					>Visibility<select v-model="item.clearance" multiple required>
-						<option v-for="tag in clearances" :key="tag">{{ tag }}</option>
-					</select></label
-				>
+				<label>Visibility<GmClearanceSelect v-model="item.clearance" required /></label>
 				<label v-if="kind !== 'Log'"
 					>From<select v-model="item.from" :required="kind === 'Mail'">
 						<option value="">Unspecified</option>

@@ -9,6 +9,16 @@ defineProps({ map: Object, shipName: String });
 		:aria-label="'Star map showing ' + shipName + ' at ' + map.position.name"
 	>
 		<title>{{ shipName }} · {{ map.position.name }}</title>
+		<image
+			v-if="map.background"
+			:href="map.background"
+			x="0"
+			y="0"
+			width="100"
+			height="100"
+			:opacity="map.backgroundOpacity ?? 0.7"
+			:preserveAspectRatio="map.backgroundFit === 'cover' ? 'xMidYMid slice' : 'xMidYMid meet'"
+		/>
 		<path
 			v-for="n in 11"
 			:key="n"

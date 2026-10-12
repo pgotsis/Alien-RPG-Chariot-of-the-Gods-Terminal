@@ -298,28 +298,6 @@
       "listed": true,
       "photo": "images/generic/f11.jpg",
       "pinHash": "a1af06f8652165963f6c9bf45418982f7b6f01dc77646ae08e2c22af5fe17282"
-    },
-    {
-      "id": "s-park",
-      "name": "S. Park",
-      "shortName": "S.Park",
-      "job": "Company Auditor",
-      "clearance": ["company"],
-      "listed": false,
-      "external": true,
-      "homeShip": "USCSS Montero",
-      "photo": "",
-      "pinHash": "8e6651210a83c1d077f12bdb27cb062d7506a1656be502dc1071d2d4e35b19d0",
-      "overrideHash": "60905a19c3f718949661690fbf313f0011d2b413afeb6b75a124db1b5d659c44",
-      "packetShip": "montero",
-      "restrictTo": {
-        "modules": ["map", "personnel", "status", "logs"],
-        "mail": [],
-        "notes": [],
-        "schematic": "public",
-        "rosterDetail": false,
-        "seeClearance": ["public", "crew"]
-      }
     }
   ],
   "mail": [

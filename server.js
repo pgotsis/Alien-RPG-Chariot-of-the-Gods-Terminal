@@ -178,7 +178,7 @@ async function main() {
 		return tables.gmDetail(request.params.code)
 	})
 
-	app.patch(basePath + 'api/gm/tables/:code', async function (request, reply) {
+	app.patch(basePath + 'api/gm/tables/:code', { bodyLimit: 4 * 1024 * 1024 }, async function (request, reply) {
 		if (!gmOnly(request, reply)) return
 		return tables.patch(request.params.code, request.body)
 	})

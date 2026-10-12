@@ -1,8 +1,8 @@
 <script setup>
+import GmClearanceSelect from "./GmClearanceSelect.vue";
 import { ref, watch } from "vue";
 const props = defineProps({ ship: Object, portraits: Array });
 const emit = defineEmits(["patch"]);
-const clearances = ["public", "crew", "security", "research", "command", "company"];
 const statuses = [
 	"Aboard",
 	"Cryo",
@@ -67,11 +67,7 @@ function availableStatuses(account) {
 						<option v-for="status in availableStatuses(account)" :key="status">{{ status }}</option>
 					</select></label
 				>
-				<label
-					>Clearance<select v-model="account.clearance" multiple required>
-						<option v-for="tag in clearances" :key="tag">{{ tag }}</option>
-					</select></label
-				>
+				<label>Clearance<GmClearanceSelect v-model="account.clearance" required /></label>
 				<label
 					>New PIN<input
 						v-model="account.pin"
@@ -96,11 +92,7 @@ function availableStatuses(account) {
 						<option v-for="status in statuses" :key="status">{{ status }}</option>
 					</select></label
 				>
-				<label
-					>Clearance<select v-model="newCrew.clearance" multiple required>
-						<option v-for="tag in clearances" :key="tag">{{ tag }}</option>
-					</select></label
-				>
+				<label>Clearance<GmClearanceSelect v-model="newCrew.clearance" required /></label>
 				<label
 					>PIN code<input
 						v-model="newCrew.pin"

@@ -1,4 +1,5 @@
 <script setup>
+import GmClearanceSelect from "./GmClearanceSelect.vue";
 import { ref, watch } from "vue";
 const props = defineProps({ ship: Object, images: Array });
 const emit = defineEmits(["patch"]);
@@ -134,10 +135,7 @@ function addRoom() {
 				<summary>{{ room.name }} · {{ id }}</summary>
 				<div class="gm-fields">
 					<label>Room name<input v-model="room.name" maxlength="200" required /></label
-					><label
-						>Required clearance<select v-model="room.requires" multiple>
-							<option v-for="tag in tags" :key="tag">{{ tag }}</option>
-						</select></label
+					><label>Required clearance<GmClearanceSelect v-model="room.requires" /></label
 					><label v-for="tag in tags" :key="tag"
 						>{{ tag }} detail<textarea
 							v-model="room.text[tag]"
