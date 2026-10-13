@@ -70,6 +70,7 @@ QR codes are generated locally. A crew QR grants that person's access to anyone 
 
 - Edit overview/deck images by clearance, deck dimensions, room hotspots and descriptions.
 - Use repository images, HTTPS image URLs or GM-authenticated uploads for deck plans and star-map backgrounds. PNG, JPEG and WebP uploads are decoded and re-encoded on the server, stripped of metadata and limited in size and dimensions. SVG and executable uploads are rejected.
+<img src="screenshots/starmap.jpg" alt="Crew rolodex and PIN keypad on the login screen" width="900">
 - A command/company Star map with location presets, editable waypoints, ship position and navigation notes. The map uses schematic coordinates.
 - Legacy Astraeus media and puzzle scripts are retained as scenario material. The current terminal lists tasks but does not execute those legacy procedures.
 
