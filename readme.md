@@ -73,7 +73,7 @@ QR codes are generated locally. A crew QR grants that person's access to anyone 
 
 <img src="screenshots/starmap.jpg" alt="Crew rolodex and PIN keypad on the login screen" width="900">
 
-- A command/company Star map with location presets, editable waypoints, ship position and navigation notes. The map uses schematic coordinates.
+- A command/company Star map with location presets, editable waypoints, ship position and navigation notes. Choose backgrounds from `client/public/images/star_maps/`, a URL or an upload; pan, zoom and crop the framing, and hide the grid for maps that already include one. The map uses schematic coordinates.
 - Legacy Astraeus media and puzzle scripts are retained as scenario material. The current terminal lists tasks but does not execute those legacy procedures.
 
 # Run

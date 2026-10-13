@@ -365,3 +365,41 @@ test('legacy facility-local personal records migrate without losing differing hi
 	f.restart()
 	assert.equal(f.tables.readState(code).notes.filter((note) => note.title === 'Legacy').length, 2)
 })
+
+test('repository star maps and background framing persist with validated grid and crop settings', (t) => {
+	const f = fixture(t)
+	const { code } = f.tables.createTable('montero')
+	const detail = f.tables.gmDetail(code)
+	assert(detail.starMapImages.includes('images/star_maps/full_map.jpg'))
+	assert(detail.starMapImages.includes('images/star_maps/montero.jpg'))
+	const map = {
+		...detail.ships[0].starMap,
+		background: 'images/star_maps/full_map.jpg',
+		backgroundView: { zoom: 3, x: -70, y: -20 },
+		showGrid: false,
+	}
+	f.tables.patch(code, { starMap: map })
+	f.restart()
+	assert.deepEqual(f.tables.readState(code).starMap, map)
+	for (const backgroundView of [
+		{ zoom: 0, x: 0, y: 0 },
+		{ zoom: 9, x: 0, y: 0 },
+		{ zoom: 2, x: 900, y: 0 },
+		{ zoom: 2, x: 0, y: '0' },
+	])
+		assert.throws(
+			() => f.tables.patch(code, { starMap: { ...map, backgroundView } }),
+			/pan or zoom/,
+		)
+	assert.throws(
+		() => f.tables.patch(code, { starMap: { ...map, showGrid: 'false' } }),
+		/grid visibility/,
+	)
+	assert.throws(
+		() =>
+			f.tables.patch(code, {
+				starMap: { ...map, background: 'images/star_maps/../../secret.png' },
+			}),
+		/HTTPS/,
+	)
+})

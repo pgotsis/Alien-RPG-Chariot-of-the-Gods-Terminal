@@ -512,3 +512,9 @@ button, .mail-item, .list-btn { touch-action: manipulation; }
 .gm-crew-card .gm-company-override { flex-basis: 100%; grid-template-columns: minmax(8rem, 1fr) minmax(12rem, 2fr); }
 .gm-company-override .hint { grid-column: 1 / -1; }
 @media (max-width: 640px) { .gm-crew-card .gm-company-override { grid-template-columns: 1fr; } }
+
+.star-map-editable { cursor: grab; touch-action: none; user-select: none; }
+.star-map-editable.dragging { cursor: grabbing; }
+.pin-panel > .actions { max-width: 18rem; margin: 0.8rem auto 0; justify-content: center; }
+.pin-panel > .actions > .term-btn { flex: 1 1 auto; }
+@media (max-width: 640px) { .pin-panel > .actions { max-width: none; } }

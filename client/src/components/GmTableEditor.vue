@@ -148,6 +148,7 @@ function toggleShip(id, on) {
 					@patch="patch"
 				/>
 				<GmStarMapEditor
+					:images="detail.starMapImages"
 					v-else-if="section === 'starmap'"
 					:ship="ship"
 					:table-code="detail.code"

@@ -2,7 +2,11 @@
 import { ref, watch } from "vue";
 import GmImageUpload from "./GmImageUpload.vue";
 import StarMapPlot from "./StarMapPlot.vue";
-const props = defineProps({ ship: Object, tableCode: String });
+const props = defineProps({
+	ship: Object,
+	tableCode: String,
+	images: { type: Array, default: () => [] },
+});
 const emit = defineEmits(["patch"]);
 const map = ref(null);
 const backgroundError = ref("");
@@ -26,6 +30,11 @@ function choosePosition() {
 	if (chosenPosition.value !== "Custom position") map.value.position.name = chosenPosition.value;
 }
 
+function background(url) {
+	map.value.background = url;
+	map.value.backgroundView = { zoom: 1, x: 0, y: 0 };
+}
+
 watch(
 	() => props.ship,
 	(ship) => {
@@ -33,6 +42,8 @@ watch(
 			background: "",
 			backgroundOpacity: 0.7,
 			backgroundFit: "contain",
+			showGrid: true,
+			backgroundView: { zoom: 1, x: 0, y: 0 },
 			...JSON.parse(JSON.stringify(ship.starMap)),
 		};
 		backgroundError.value = "";
@@ -86,18 +97,35 @@ watch(
 			</div>
 			<details class="panel">
 				<summary>Background image</summary>
+				<label
+					>Repository star map<select
+						:value="images.includes(map.background) ? map.background : ''"
+						@change="background($event.target.value)"
+					>
+						<option value="">Choose a repository image</option>
+						<option v-for="image in images" :key="image" :value="image">
+							{{
+								image
+									.split("/")
+									.pop()
+									.replace(/\.[^.]+$/, "")
+									.replaceAll("_", " ")
+							}}
+						</option>
+					</select></label
+				>
 				<div class="gm-fields">
 					<label
 						>Image URL<input
 							:value="map.background.startsWith('data:') ? '' : map.background"
 							placeholder="https://example.com/star-map.jpg"
 							maxlength="2048"
-							@input="map.background = $event.target.value"
+							@input="background($event.target.value)"
 					/></label>
 					<label
 						>Upload image<GmImageUpload
 							:table-code="tableCode"
-							@uploaded="map.background = $event"
+							@uploaded="background($event)"
 							@busy="uploading = $event"
 					/></label>
 					<label
@@ -131,7 +159,47 @@ watch(
 					Remove background
 				</button>
 			</details>
-			<StarMapPlot :map="map" :ship-name="ship.name" />
+			<label class="gm-inline"><input v-model="map.showGrid" type="checkbox" /> Show grid</label>
+			<div v-if="map.background" class="gm-fields">
+				<label
+					>Zoom<input
+						v-model.number="map.backgroundView.zoom"
+						type="range"
+						min="1"
+						max="8"
+						step="0.1" /></label
+				><label
+					>Horizontal pan<input
+						v-model.number="map.backgroundView.x"
+						type="number"
+						min="-800"
+						max="800"
+						step="1" /></label
+				><label
+					>Vertical pan<input
+						v-model.number="map.backgroundView.y"
+						type="number"
+						min="-800"
+						max="800"
+						step="1" /></label
+				><button
+					class="term-btn quiet"
+					type="button"
+					@click="map.backgroundView = { zoom: 1, x: 0, y: 0 }"
+				>
+					Reset framing
+				</button>
+			</div>
+			<p v-if="map.background" class="hint">
+				Drag the background to pan; scroll to zoom. The map area crops the image automatically.
+				Original files are unchanged. Save to apply this framing to player terminals.
+			</p>
+			<StarMapPlot
+				:map="map"
+				:ship-name="ship.name"
+				editable
+				@view-change="map.backgroundView = $event"
+			/>
 			<h3>Systems and waypoints</h3>
 			<div v-for="(point, index) in map.locations" :key="index" class="gm-fields panel">
 				<label>Name<input v-model="point.name" required maxlength="200" /></label
